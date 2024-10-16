@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -16,6 +18,11 @@
     "noUnusedParameters": true,
     "target": "es2017",
     "baseUrl": ".",
+    "paths": {
+      "@botpress/*": [
+        "node_modules/@botpress/*"
+      ]
+    },
     "outDir": "dist",
     "checkJs": false,
     "incremental": true,
@@ -24,5 +31,10 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": false
   },
-  "include": [".botpress/**/*", "src/**/*", "./*.ts", "./*.json"]
+  "include": [
+    ".botpress/**/*",
+    "src/**/*",
+    "./*.ts",
+    "./*.json"
+  ]
 }
