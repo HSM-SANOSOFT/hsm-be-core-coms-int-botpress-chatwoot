@@ -1,10 +1,9 @@
-import { IntegrationDefinition, z, messages} from '@botpress/sdk'
+import { IntegrationDefinition, z, messages } from '@botpress/sdk'
 import { integrationName } from './package.json'
-import { chatwoot } from '.botpress/implementation/channels'
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '1.0.2',
+  version: '2.0.1',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
@@ -34,28 +33,27 @@ export default new IntegrationDefinition({
       inboxNumber: z.number(),
     }),
   },
-  states: {
-  },
+  states: {},
   channels: {
     chatwoot: {
-      // messages: messages.defaults,  // use this to support all message types supported in Botpress Studio
-      messages: messages.defaults, // use this to support all message types supported in Botpress Studio
+      messages: messages.defaults, // Using messages.defaults to support all message types out of the box
       message: {
         tags: {
-          chatwootId: {}, // Add this line to tag messages
+          chatwootId: {}, // Tag messages with chatwootId
         },
       },
       conversation: {
         tags: {
-          chatwootId: {}, // Add this line to tag conversations
+          chatwootId: {}, // Tag conversations with chatwootId
+          platform: {}, // Include platform tag to distinguish between WhatsApp, FacebookPage, etc.
+          inboxId: {}, // Include the inbox ID tag
         },
       },
     },
   },
   user: {
     tags: {
-      chatwootId: {}, // Add this line to tag users
+      chatwootId: {}, // Tag users with chatwootId
     },
   },
-  
 })
