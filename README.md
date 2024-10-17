@@ -16,29 +16,35 @@
    pnpm install
    ```
 
-4. Build the integration:
+4. Install the Botpress SDK:
+   ```sh
+   pnpm add @botpress/sdk
+   ```
+
+5. Build the integration:
    ```sh
    bp build
    ```
 
 ### Log into Botpress
-5. Log in to Botpress:
+6. Log in to Botpress:
    ```sh
    bp login
    ```
 
 ### Build and Deploy Integration
-6. To build the integration:
+7. To build the integration:
    ```sh
    bp build
    ```
 
-7. To deploy the integration:
+8. To deploy the integration:
    ```sh
    bp deploy
+   ```
 
 ### Botpress Cliente Help
-8. To accces the botpress client menu
+9. To access the Botpress client menu:
    ```sh
    bp --help
-   
+   ```
