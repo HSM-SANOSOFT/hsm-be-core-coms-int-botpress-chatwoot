@@ -12,7 +12,7 @@ export const sendOutgoingMessage = async (params) => {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }
 
-    const chatwootConversationId = conversation.id;
+    const chatwootConversationId = conversation.tags?.chatwootId;
     if (!chatwootConversationId) {
         throw new Error("chatwootConversationId is undefined or null in sendOutgoingMessage.");
     }
