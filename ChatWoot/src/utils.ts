@@ -40,6 +40,19 @@ export const sendToChatwoot = async (messageBody: any, ctx: any, conversation: a
  */
 export const prepareChatwootMessage = (payload: any, messageType: string) => {
     switch (messageType) {
+        case 'text':
+            return {
+                content: payload.text,
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'markdown':
+            return {
+                content: payload.text,
+                content_type: 'markdown',
+                message_type: 'outgoing',
+                private: false,
+            };
         case 'input_select':
             return {
                 content: payload.text,
@@ -48,6 +61,37 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
                     items: payload.options.map((option: any) => {
                         return { title: option.label, value: option.value };
                     }),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'media':
+            return {
+                content: payload.caption || '',
+                attachments: [{
+                    url: payload.url,
+                    content_type: payload.mediaType
+                }],
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'block':
+            return {
+                content: payload.text || '',
+                attachments: payload.attachments || [],
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'interactive_button':
+            return {
+                content: payload.text,
+                content_type: 'button',
+                content_attributes: {
+                    items: payload.buttons.map((button: any) => ({
+                        title: button.label,
+                        type: button.type,
+                        value: button.payload,
+                    })),
                 },
                 message_type: 'outgoing',
                 private: false,

@@ -3,7 +3,7 @@ import { integrationName } from './package.json'
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '3.0.0',
+  version: '3.0.1',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',

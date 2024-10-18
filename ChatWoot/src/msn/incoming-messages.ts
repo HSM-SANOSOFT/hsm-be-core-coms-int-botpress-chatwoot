@@ -1,7 +1,6 @@
 // File: src/msn/incoming-messages.ts
 
 import { IntegrationContext, Client } from '@botpress/sdk';
-import { Message } from './message-types';
 
 export const handleIncomingMessage = async (
     data: any,
