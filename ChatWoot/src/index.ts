@@ -44,55 +44,18 @@ export default new bp.Integration({
     chatwoot: {
       messages: {
         // Delegating the handling of outgoing messages to sendOutgoingMessage in outgoing-messages.ts
-        text: async (params) => {
-          console.log("Debugging params for text message:", params);
-          await sendOutgoingMessage({ ...params, type: 'text'});
-        },
-
-        choice: async (params) => {
-          console.log("Debugging params for choice message:", params);
-          await sendOutgoingMessage({ ...params, type: 'choice' });
-        },
-        dropdown: async (params) => {
-          console.log("Debugging params for dropdown message:", params);
-          await sendOutgoingMessage({ ...params, type: 'dropdown' });
-        },
-        image: async (params) => {
-          console.log("Debugging params for image message:", params);
-          await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'image' });
-        },
-        video: async (params) => {
-          console.log("Debugging params for video message:", params);
-          await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'video' });
-        },
-        audio: async (params) => {
-          console.log("Debugging params for audio message:", params);
-          await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'audio' });
-        },
-        file: async (params) => {
-          console.log("Debugging params for file message:", params);
-          await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'file' });
-        },
-        markdown: async (params) => {
-          console.log("Debugging params for markdown message:", params);
-          await sendOutgoingMessage({ ...params, type: 'markdown' });
-        },
-        bloc: async (params) => {
-          console.log("Debugging params for bloc message:", params);
-          await sendOutgoingMessage({ ...params, type: 'block' });
-        },
-        carousel: async (params) => {
-          console.log("Debugging params for carousel message:", params);
-          await sendOutgoingMessage({ ...params, type: 'carousel' });
-        },
-        card: async (params) => {
-          console.log("Debugging params for card message:", params);
-          await sendOutgoingMessage({ ...params, type: 'card' });
-        },
-        location: async (params) => {
-          console.log("Debugging params for location message:", params);
-          await sendOutgoingMessage({ ...params, type: 'location' });
-        },
+        text: async (params) => {await sendOutgoingMessage({ ...params, type: 'text'});},
+        choice: async (params) => { await sendOutgoingMessage({ ...params, type: 'choice' });},
+        dropdown: async (params) => {await sendOutgoingMessage({ ...params, type: 'dropdown' });},
+        image: async (params) => {await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'image' });},
+        video: async (params) => {await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'video' });},
+        audio: async (params) => {await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'audio' });},
+        file: async (params) => {await sendOutgoingMessage({ ...params, type: 'media', mediaType: 'file' });},
+        markdown: async (params) => {await sendOutgoingMessage({ ...params, type: 'markdown' });},
+        bloc: async (params) => {await sendOutgoingMessage({ ...params, type: 'block' });},
+        carousel: async (params) => {await sendOutgoingMessage({ ...params, type: 'carousel' });},
+        card: async (params) => {await sendOutgoingMessage({ ...params, type: 'card' });},
+        location: async (params) => {await sendOutgoingMessage({ ...params, type: 'location' });},
       },
     },
   },

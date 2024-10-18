@@ -7,7 +7,15 @@ import FormData from 'form-data';
 
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
-    console.log("Debugging in sendOutgoingMessage - Conversation Object:", conversation);
+
+    // Logging the key parameters for debugging
+    console.log("Conversation ID:", conversation?.tags?.chatwootId);
+    console.log("Platform:", conversation?.tags?.platform);
+    console.log("Inbox ID:", conversation?.tags?.inboxId);
+    console.log("Content:", message.content);
+    console.log("Message ID:", message.id);
+    console.log("User ID:", message.userId);
+
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }
@@ -18,6 +26,7 @@ export const sendOutgoingMessage = async (params) => {
     }
 
     const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/messages`;
+    console.log("Message Endpoint:", messageEndpoint);
 
     try {
         switch (message.type) {
@@ -49,6 +58,7 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
         message_type: 'outgoing',
         private: false,
     };
+    console.log("Message Body:", messageBody);
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
@@ -66,6 +76,7 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
         message_type: 'outgoing',
         private: false,
     };
+    console.log("Message Body:", messageBody);
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
@@ -83,6 +94,7 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
         message_type: 'outgoing',
         private: false,
     };
+    console.log("Message Body:", messageBody);
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
@@ -97,6 +109,8 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
         });
         formData.append('message_type', 'outgoing');
 
+        console.log("Form Data for Media Message:", formData);
+
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
@@ -105,7 +119,9 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
             maxBodyLength: Infinity,
         };
 
-        await axios.post(endpoint, formData, config);
+        console.log("Message Endpoint:", endpoint);
+        const response = await axios.post(endpoint, formData, config);
+        console.log("Request Response:", response.data);
     } catch (error) {
         console.error(`Error sending media message: ${error}`);
         throw new Error(`Error sending media message: ${error}`);
@@ -114,11 +130,17 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
 
 // Helper function to send the message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
-    await axios.post(endpoint, messageBody, {
-        headers: {
-            'api_access_token': ctx.configuration.botToken,
-            'Content-Type': 'application/json',
-        },
-        maxBodyLength: Infinity,
-    });
+    try {
+        const response = await axios.post(endpoint, messageBody, {
+            headers: {
+                'api_access_token': ctx.configuration.botToken,
+                'Content-Type': 'application/json',
+            },
+            maxBodyLength: Infinity,
+        });
+        console.log("Request Response:", response.data);
+    } catch (error) {
+        console.error(`Error sending message to Chatwoot: ${error}`);
+        throw new Error(`Error sending message to Chatwoot: ${error}`);
+    }
 };

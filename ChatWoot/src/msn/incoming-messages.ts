@@ -28,12 +28,12 @@ export const handleIncomingMessage = async (
     const inboxId = data?.conversation?.inbox_id?.toString();
     const platform = data?.conversation?.channel?.replace('Channel::', '').toLowerCase();
 
-    console.log('Conversation ID: ', conversationId);
-    console.log('User ID: ', userId);
-    console.log('Message ID: ', messageId);
-    console.log('Content: ', content);
-    console.log('Inbox ID: ', inboxId);
-    console.log('Platform: ', platform);
+    console.log('Conversation ID:', conversationId);
+    console.log('Platform:', platform);
+    console.log('Inbox ID:', inboxId);
+    console.log('Content:', content);
+    console.log('Message ID:', messageId);
+    console.log('User ID:', userId);
 
     if (!conversationId || !userId || !messageId) {
         return {
