@@ -1,5 +1,3 @@
-// File: ChatWoot/src/msn/outgoing-messages.ts
-
 import axios from 'axios';
 import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
@@ -8,6 +6,7 @@ import FormData from 'form-data';
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
     console.log("Debugging in sendOutgoingMessage - Message Object:", message);
+
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }
@@ -30,8 +29,17 @@ export const sendOutgoingMessage = async (params) => {
             case 'dropdown':
                 await sendDropdownMessage(message, messageEndpoint, ctx);
                 break;
-            case 'media':
-                await sendMediaMessage(message, messageEndpoint, ctx);
+            case 'image':
+                await sendMediaMessage(message, messageEndpoint, ctx, 'image');
+                break;
+            case 'video':
+                await sendMediaMessage(message, messageEndpoint, ctx, 'video');
+                break;
+            case 'audio':
+                await sendMediaMessage(message, messageEndpoint, ctx, 'audio');
+                break;
+            case 'file':
+                await sendMediaMessage(message, messageEndpoint, ctx, 'file');
                 break;
             default:
                 throw new Error(`Unsupported message type: ${message.type}`);
@@ -45,7 +53,7 @@ export const sendOutgoingMessage = async (params) => {
 // Send a text message
 const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.payload?.text,
+        content: message.content,
         message_type: 'outgoing',
         private: false,
     };
@@ -55,10 +63,10 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 // Send a choice message
 const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.payload?.text,
+        content: message.text,
         content_type: 'input_select',
         content_attributes: {
-            items: message.payload?.options.map((option: any) => ({
+            items: message.options.map((option: any) => ({
                 title: option.label,
                 value: option.value,
             })),
@@ -72,10 +80,10 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
 // Send a dropdown message
 const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.payload?.text,
+        content: message.text,
         content_type: 'input_select',
         content_attributes: {
-            items: message.payload?.options.map((option: any) => ({
+            items: message.options.map((option: any) => ({
                 title: option.label,
                 value: option.value,
             })),
@@ -86,32 +94,26 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
-// Send a media message
-// Send a media message
-const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
+// Send a media message (image, video, audio, or file)
+const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string) => {
     try {
-        if (!message.url) {
-            throw new Error('Media message is missing URL.');
-        }
+        const formData = new FormData();
 
-        // Download the media file from the provided URL
-        console.log("Attempting to download media from URL:", message.url);
+        // Fetch media based on its URL and create a stream
         const response = await axios.get(message.url, { responseType: 'stream' });
 
-        // Prepare the form data with media and caption
-        const formData = new FormData();
+        // Append media to formData
         formData.append('attachments[]', response.data, {
             filename: message.caption || 'media',
             contentType: response.headers['content-type'],
         });
 
-        // Set the message type and other properties
+        // Set message type and content
         formData.append('message_type', 'outgoing');
         if (message.caption) {
             formData.append('content', message.caption);
         }
 
-        // Set the request headers, including form-data specific headers
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
@@ -120,23 +122,16 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
             maxBodyLength: Infinity,
         };
 
-        console.log("Sending media message to endpoint:", endpoint);
-        console.log("Form data headers:", formData.getHeaders());
-
         // Send the media message to Chatwoot
         const mediaResponse = await axios.post(endpoint, formData, config);
-        console.log("Media message sent successfully. Request Response:", mediaResponse.data);
+        console.log(`${mediaType} message sent successfully. Response:`, mediaResponse.data);
     } catch (error) {
-        console.error(`Error sending media message. Details: ${error.message}`);
-        if (error.response) {
-            console.error(`Response data: ${JSON.stringify(error.response.data)}`);
-        }
-        throw new Error(`Error sending media message: ${error}`);
+        console.error(`Error sending ${mediaType} message: ${error.message}`);
+        throw new Error(`Error sending ${mediaType} message: ${error}`);
     }
 };
 
-
-// Helper function to send the message to Chatwoot
+// Helper function to send message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
     try {
         const response = await axios.post(endpoint, messageBody, {
@@ -146,7 +141,7 @@ const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
             },
             maxBodyLength: Infinity,
         });
-        console.log("Request Response:", response.data);
+        console.log("Message sent to Chatwoot successfully. Response:", response.data);
     } catch (error) {
         console.error(`Error sending message to Chatwoot: ${error}`);
         throw new Error(`Error sending message to Chatwoot: ${error}`);

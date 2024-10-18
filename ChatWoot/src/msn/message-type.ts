@@ -1,36 +1,6 @@
-// File: ChatWoot/src/msn/message-type.ts
-
 export interface TextPayload {
     type: 'text';
     content: string;
-}
-
-export interface MediaPayload {
-    type: 'media';
-    mediaType: 'image' | 'video' | 'audio' | 'file'; // Differentiates the type of media
-    url: string;
-    caption?: string;
-}
-
-export interface CarouselPayload {
-    type: 'carousel';
-    content: string;
-    items: CarouselItem[];
-}
-
-export interface CarouselItem {
-    title: string;
-    subtitle?: string;
-    imageUrl?: string;
-    actions?: Action[];
-}
-
-export interface CardPayload {
-    type: 'card';
-    title: string;
-    subtitle?: string;
-    imageUrl?: string;
-    actions?: Action[];
 }
 
 export interface ChoicePayload {
@@ -55,6 +25,53 @@ export interface DropdownOption {
     value: string;
 }
 
+// Separate payload definitions for each media type
+export interface ImagePayload {
+    type: 'image';
+    url: string;
+    caption?: string;
+}
+
+export interface VideoPayload {
+    type: 'video';
+    url: string;
+    caption?: string;
+}
+
+export interface AudioPayload {
+    type: 'audio';
+    url: string;
+    caption?: string;
+}
+
+export interface FilePayload {
+    type: 'file';
+    url: string;
+    caption?: string;
+}
+
+// Additional message types from your original code
+export interface CarouselPayload {
+    type: 'carousel';
+    content: string;
+    items: CarouselItem[];
+}
+
+export interface CarouselItem {
+    title: string;
+    subtitle?: string;
+    imageUrl?: string;
+    actions?: Action[];
+}
+
+export interface CardPayload {
+    type: 'card';
+    title: string;
+    subtitle?: string;
+    imageUrl?: string;
+    actions?: Action[];
+}
+
 export interface LocationPayload {
     type: 'location';
     title: string;
@@ -74,13 +91,6 @@ export interface BlockPayload {
     attachments?: any[];
 }
 
-export interface Action {
-    label: string;
-    type: 'link' | 'button';
-    url?: string; // For links
-    value?: string; // For actions like buttons
-}
-
 export interface InteractiveButtonPayload {
     type: 'interactive_button';
     text: string;
@@ -93,14 +103,24 @@ export interface InteractiveButton {
     type: 'postback' | 'url';
 }
 
-// The unified message type that covers all possible message payloads.
+export interface Action {
+    label: string;
+    type: 'link' | 'button';
+    url?: string; // For links
+    value?: string; // For actions like buttons
+}
+
+// Unified Message Type covering all possible payloads
 export type Message =
     | TextPayload
-    | MediaPayload
-    | CarouselPayload
-    | CardPayload
     | ChoicePayload
     | DropdownPayload
+    | ImagePayload
+    | VideoPayload
+    | AudioPayload
+    | FilePayload
+    | CarouselPayload
+    | CardPayload
     | LocationPayload
     | MarkdownPayload
     | BlockPayload
