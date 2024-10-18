@@ -11,9 +11,15 @@ export const sendOutgoingMessage = async (
     conversation: any
 ) => {
     console.log("Debugging in sendOutgoingMessage - Conversation Object:", conversation);
-    console.log("Debugging in sendOutgoingMessage - Message Object:", message);
-    
-    const chatwootConversationId = conversation.tags.chatwootId; // Updated to use conversation.id directly
+    if (!conversation) {
+        throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
+    }
+
+    const chatwootConversationId = conversation.id;
+    if (!chatwootConversationId) {
+        throw new Error("chatwootConversationId is undefined or null in sendOutgoingMessage.");
+    }
+
     const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/messages`;
 
     try {
