@@ -10,7 +10,7 @@ export const sendOutgoingMessage = async (
     ctx: IntegrationContext,
     conversation: any
 ) => {
-    const chatwootConversationId = conversation.tags.chatwootId;
+    const chatwootConversationId = conversation.id; // Updated to use conversation.id directly
     const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/messages`;
 
     try {
