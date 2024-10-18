@@ -63,7 +63,7 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 // Send a choice message
 const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.text,
+        content: message.payload?.text,
         content_type: 'input_select',
         content_attributes: {
             items: message.options.map((option: any) => ({
@@ -80,7 +80,7 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
 // Send a dropdown message
 const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.text,
+        content: message.payload?.text,
         content_type: 'input_select',
         content_attributes: {
             items: message.options.map((option: any) => ({
