@@ -97,29 +97,58 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
 // Send a media message (image, video, audio, or file)
 const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string) => {
     try {
+        // Determine the correct media URL based on the media type
+        let mediaUrl: string | undefined;
+
+        switch (mediaType) {
+            case 'image':
+                mediaUrl = message.payload?.imageUrl;
+                break;
+            case 'video':
+                mediaUrl = message.payload?.videoUrl;
+                break;
+            case 'audio':
+                mediaUrl = message.payload?.audioUrl;
+                break;
+            case 'file':
+                mediaUrl = message.payload?.fileUrl;
+                break;
+            default:
+                throw new Error(`Unsupported media type: ${mediaType}`);
+        }
+
+        if (!mediaUrl) {
+            throw new Error(`Media URL is missing for type: ${mediaType}`);
+        }
+
+        console.log(`Fetching ${mediaType} from URL:`, mediaUrl);
+
+        // Download media from the provided URL
+        const response = await axios.get(mediaUrl, { responseType: 'stream' });
+        console.log(`${mediaType} fetched successfully from URL:`, mediaUrl);
+
+        // Prepare form data to send to Chatwoot
         const formData = new FormData();
 
-        // Fetch media based on its URL and create a stream
-        const response = await axios.get(message.payload?.url, { responseType: 'stream' });
+        // Add content field (caption or description for media)
+        if (message.payload?.caption) {
+            formData.append('content', message.payload?.caption);
+        } else {
+            formData.append('content', ''); // Default to empty string if no caption
+        }
 
-        // Append media to formData
+        // Add the media file to 'attachments[]'
         formData.append('attachments[]', response.data, {
-            filename: message.caption || 'media',
+            filename: 'media', // You can change this dynamically based on media type or URL
             contentType: response.headers['content-type'],
         });
-
-        // Set message type and content
-        formData.append('message_type', 'outgoing');
-        if (message.caption) {
-            formData.append('content', message.caption);
-        }
 
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
-                ...formData.getHeaders(),
+                ...formData.getHeaders(), // Ensure proper multipart/form-data headers
             },
-            maxBodyLength: Infinity,
+            maxBodyLength: Infinity, // Handle large files
         };
 
         // Send the media message to Chatwoot

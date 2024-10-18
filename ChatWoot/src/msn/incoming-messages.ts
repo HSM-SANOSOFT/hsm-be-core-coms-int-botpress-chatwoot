@@ -1,5 +1,3 @@
-// File: ChatWoot/src/msn/incoming-messages.ts
-
 import { IntegrationContext, Client, RuntimeError } from '@botpress/sdk';
 
 export const handleIncomingMessage = async (
@@ -60,12 +58,42 @@ export const handleIncomingMessage = async (
             tags: { chatwootId: `${userId}` },
         });
 
+        // Determine the message type and handle accordingly
+        let payload: any;
+        let messageType: string;
+
+        if (data?.attachments?.length) {
+            const attachment = data.attachments[0];
+
+            // Handling media types
+            if (attachment.content_type.startsWith('image')) {
+                messageType = 'image';
+                payload = { imageUrl: attachment.data_url };
+            } else if (attachment.content_type.startsWith('video')) {
+                messageType = 'video';
+                payload = { videoUrl: attachment.data_url };
+            } else if (attachment.content_type.startsWith('audio')) {
+                messageType = 'audio';
+                payload = { audioUrl: attachment.data_url };
+            } else if (attachment.content_type.startsWith('application') || attachment.content_type.startsWith('file')) {
+                messageType = 'file';
+                payload = { fileUrl: attachment.data_url };
+            } else {
+                messageType = 'text';
+                payload = { text: content }; // Defaulting to text if unknown attachment type
+            }
+        } else {
+            // Handling text messages
+            messageType = 'text';
+            payload = { text: content };
+        }
+
         await client.createMessage({
             tags: { chatwootId: `${messageId}` },
-            type: 'text',
+            type: messageType,
             userId: user.id,
             conversationId: conversation.id,
-            payload: { text: content },
+            payload: payload,
         });
 
         return {

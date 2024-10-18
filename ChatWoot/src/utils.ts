@@ -1,5 +1,3 @@
-// File: ChatWoot/src/utils.ts
-
 import axios from 'axios';
 import { RuntimeError } from '@botpress/sdk';
 import FormData from 'form-data';
@@ -65,17 +63,47 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
                 message_type: 'outgoing',
                 private: false,
             };
-        case 'media':
+        case 'image':  // Handle image
             return {
                 content: payload.caption || '',
                 attachments: [{
-                    url: payload.url,
-                    content_type: payload.mediaType
+                    url: payload.imageUrl,
+                    content_type: payload.contentType || 'image/jpeg' // Dynamic content type or default
                 }],
                 message_type: 'outgoing',
                 private: false,
             };
-        case 'block':
+        case 'video':  // Handle video
+            return {
+                content: payload.caption || '',
+                attachments: [{
+                    url: payload.videoUrl,
+                    content_type: payload.contentType || 'video/mp4' // Dynamic content type or default
+                }],
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'audio':  // Handle audio
+            return {
+                content: payload.caption || '',
+                attachments: [{
+                    url: payload.audioUrl,
+                    content_type: payload.contentType || 'audio/mpeg' // Dynamic content type or default
+                }],
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'file':  // Handle file
+            return {
+                content: payload.caption || '',
+                attachments: [{
+                    url: payload.fileUrl,
+                    content_type: payload.contentType || 'application/octet-stream' // Dynamic content type or default
+                }],
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'bloc':  // Corrected from 'block' to 'bloc'
             return {
                 content: payload.text || '',
                 attachments: payload.attachments || [],
@@ -121,7 +149,7 @@ export const uploadMediaToChatwoot = async (mediaUrl: string, ctx: any, conversa
         const formData = new FormData();
         formData.append('attachments[]', response.data, {
             filename: `${mediaType}.${mediaUrl.split('.').pop() || 'media'}`,
-            contentType: response.headers['content-type'],
+            contentType: response.headers['content-type'], // Dynamically set the content-type
         });
         formData.append('message_type', 'outgoing');
 
