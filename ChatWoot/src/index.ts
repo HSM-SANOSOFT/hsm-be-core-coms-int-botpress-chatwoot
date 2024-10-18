@@ -46,8 +46,10 @@ export default new bp.Integration({
         // Delegating the handling of outgoing messages to sendOutgoingMessage in outgoing-messages.ts
         text: async (params) => {
           console.log("Debugging params for text message:", params);
-          await sendOutgoingMessage({ ...params, type: 'text' });
+          const { ctx, conversation, message, client } = params;
+          await sendOutgoingMessage({ ctx, conversation, message, type: 'text', client });
         },
+
         choice: async (params) => {
           console.log("Debugging params for choice message:", params);
           await sendOutgoingMessage({ ...params, type: 'choice' });
