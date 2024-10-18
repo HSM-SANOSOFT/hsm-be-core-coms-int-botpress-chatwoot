@@ -156,43 +156,57 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
 // Send a cards message
 const sendCardsMessage = async (message: any, endpoint: string, ctx: any) => {
-    const contentType = guessContentTypeFromUrl(message.payload?.imageUrl); // Dynamically guess content type
-
     const messageBody = {
-        content: message.payload?.title || 'No title provided', // Use the title or a default
-        attachments: [{
-            url: message.payload?.imageUrl || '',
-            content_type: contentType // Dynamically set the content type
-        }],
-        message_type: 'outgoing',
-        private: false,
-        buttons: message.payload?.actions || [] // Attach buttons/actions
+        content: "card message",
+        content_type: "cards",
+        content_attributes: {
+            items: [
+                {
+                    media_url: message.payload?.imageUrl || '', // Use dynamic media URL
+                    title: message.payload?.title || 'No title provided',
+                    description: message.payload?.subtitle || 'No description provided',
+                    actions: message.payload?.actions.map(action => ({
+                        type: action.type || 'link', // Ensure you set 'link' or 'postback'
+                        text: action.text,
+                        uri: action.uri || '', // Only for link type
+                        payload: action.payload || '' // Only for postback type
+                    }))
+                }
+            ]
+        },
+        private: false
     };
+
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
+
 
 // Send a carousel message
 const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => {
     const items = message.payload?.items.map(item => ({
-        title: item.title,
-        subtitle: item.subtitle || '',
-        image: {
-            url: item.imageUrl || '',
-            content_type: guessContentTypeFromUrl(item.imageUrl) // Dynamically set the content type
-        },
-        actions: item.actions || []
+        media_url: item.imageUrl || '',   // Dynamic media URL
+        title: item.title || 'No title provided',
+        description: item.subtitle || 'No description provided',
+        actions: item.actions.map(action => ({
+            type: action.type || 'link',   // 'link' or 'postback'
+            text: action.text,
+            uri: action.uri || '',         // Used for 'link' type actions
+            payload: action.payload || ''  // Used for 'postback' type actions
+        }))
     }));
 
     const messageBody = {
-        content: 'Carousel Message',
-        message_type: 'outgoing',
-        private: false,
+        content: "carousel message",
+        content_type: "carousel",
         content_attributes: {
-            items: items || []
+            items: items
         },
+        private: false
     };
+
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
+
 
 
 // Send a location message

@@ -1,37 +1,3 @@
-import axios from 'axios';
-import { RuntimeError } from '@botpress/sdk';
-import FormData from 'form-data';
-
-/**
- * Sends a message to Chatwoot using the provided conversation details.
- * @param messageBody The body of the message to be sent.
- * @param ctx Integration context, containing configuration and other useful data.
- * @param conversation Conversation details, including tags.
- */
-export const sendToChatwoot = async (messageBody: any, ctx: any, conversation: any) => {
-    try {
-        const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
-        
-        console.log("Sending message to Chatwoot at endpoint: ", messageEndpoint);
-
-        const response = await axios.post(messageEndpoint, messageBody, {
-            headers: {
-                'api_access_token': ctx.configuration.botToken,
-                'Content-Type': 'application/json'
-            },
-            maxBodyLength: Infinity
-        });
-        
-        console.log("Response from Chatwoot: ", response.data);
-    } catch (error) {
-        console.error("Error sending message to Chatwoot: ", error.response?.data || error.message);
-        throw new RuntimeError(`Error sending message to Chatwoot! ${error}`);
-    }
-};
-
-/**
- * Prepares a message object for Chatwoot based on the provided payload and type.
- */
 export const prepareChatwootMessage = (payload: any, messageType: string) => {
     switch (messageType) {
         case 'text':
@@ -91,68 +57,61 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
                 message_type: 'outgoing',
                 private: false,
             };
+        case 'cards':  // Handle cards message type
+            return {
+                content: 'card message',
+                content_type: 'cards',
+                content_attributes: {
+                    items: [
+                        {
+                            media_url: payload.imageUrl || '',
+                            title: payload.title || 'No title provided',
+                            description: payload.subtitle || 'No description provided',
+                            actions: payload.actions.map(action => ({
+                                type: action.type || 'link',
+                                text: action.text,
+                                uri: action.uri || '',
+                                payload: action.payload || '',
+                            })),
+                        },
+                    ],
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'carousel':  // Handle carousel message type
+            return {
+                content: 'carousel message',
+                content_type: 'carousel',
+                content_attributes: {
+                    items: payload.items.map(item => ({
+                        media_url: item.imageUrl || '',
+                        title: item.title || 'No title provided',
+                        description: item.subtitle || 'No description provided',
+                        actions: item.actions.map(action => ({
+                            type: action.type || 'link',
+                            text: action.text,
+                            uri: action.uri || '',
+                            payload: action.payload || '',
+                        })),
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+        case 'location':  // Handle location message type
+            return {
+                message_type: 'outgoing',
+                content_type: 'location',
+                content_attributes: {
+                    latitude: payload.latitude,
+                    longitude: payload.longitude,
+                    name: payload.title || 'Location',
+                    address: payload.address || 'No address provided',
+                },
+                private: false,
+            };
         default:
             throw new Error(`Unsupported message type: ${messageType}`);
-    }
-};
-
-/**
- * Utility to handle uploading media to Chatwoot.
- * @param mediaUrl URL of the media to be uploaded.
- * @param ctx Integration context.
- * @param conversation The conversation object, including tags.
- * @param mediaType Type of media (image, video, etc.).
- */
-export const uploadMediaToChatwoot = async (mediaUrl: string, ctx: any, conversation: any, mediaType: string) => {
-    try {
-        console.log(`Uploading ${mediaType} from URL: ${mediaUrl}`);
-        
-        // Fetch media as a stream
-        const response = await axios.get(mediaUrl, { responseType: 'stream' });
-
-        // Validate if media was fetched correctly
-        if (!response.data) {
-            throw new Error(`Failed to fetch media from ${mediaUrl}`);
-        }
-
-        const formData = new FormData();
-        formData.append('attachments[]', response.data, {
-            filename: `${mediaType}.${mediaUrl.split('.').pop() || 'media'}`,
-            contentType: response.headers['content-type'], // Dynamic content type
-        });
-        formData.append('message_type', 'outgoing');
-
-        const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
-
-        const config = {
-            headers: {
-                'api_access_token': ctx.configuration.botToken,
-                ...formData.getHeaders(),
-            },
-            maxBodyLength: Infinity,
-        };
-
-        const mediaResponse = await axios.post(messageEndpoint, formData, config);
-        console.log(`${mediaType} uploaded successfully. Response:`, mediaResponse.data);
-    } catch (error) {
-        console.error(`Error uploading ${mediaType} to Chatwoot: ${error.message || error}`);
-        throw new RuntimeError(`Error sending ${mediaType} to Chatwoot! ${error}`);
-    }
-};
-
-/**
- * Helper function to determine the content type dynamically based on media type.
- */
-const guessContentTypeFromUrl = (mediaUrl: string) => {
-    const extension = mediaUrl.split('.').pop()?.toLowerCase();
-    switch (extension) {
-        case 'png': return 'image/png';
-        case 'jpg':
-        case 'jpeg': return 'image/jpeg';
-        case 'gif': return 'image/gif';
-        case 'mp4': return 'video/mp4';
-        case 'mp3': return 'audio/mpeg';
-        case 'pdf': return 'application/pdf';
-        default: return 'application/octet-stream';
     }
 };
