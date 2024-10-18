@@ -1,9 +1,11 @@
+// File: ChatWoot/integration.definition.ts
+
 import { IntegrationDefinition, z, messages } from '@botpress/sdk'
 import { integrationName } from './package.json'
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '2.0.1',
+  version: '3.1.8',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
