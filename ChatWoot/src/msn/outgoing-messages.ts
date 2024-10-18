@@ -100,7 +100,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         const formData = new FormData();
 
         // Fetch media based on its URL and create a stream
-        const response = await axios.get(message.url, { responseType: 'stream' });
+        const response = await axios.get(message.payload?.url, { responseType: 'stream' });
 
         // Append media to formData
         formData.append('attachments[]', response.data, {
