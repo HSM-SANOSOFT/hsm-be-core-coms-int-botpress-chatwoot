@@ -9,32 +9,28 @@ import FormData from 'form-data';
  * @param conversation Conversation details, including tags.
  */
 export const sendToChatwoot = async (messageBody: any, ctx: any, conversation: any) => {
-    console.log("Sending message to Chatwoot");
-    console.log("Conversation: ", conversation);
-    console.log("Message Body: ", messageBody);
+    try {
+        const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
 
-    const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
-    console.log("Message Endpoint: ", messageEndpoint);
-    await axios.post(messageEndpoint, messageBody, {
-        headers: {
-            'api_access_token': ctx.configuration.botToken,
-            'Content-Type': 'application/json'
-        },
-        maxBodyLength: Infinity
-    }).then((response: any) => {
-        console.log("Response For Sending Message: ", response.data);
-    }).catch((error: any) => {
-        throw new RuntimeError(
-            `Error sending message to Chatwoot! ${error}`
-        );
-    });
+        console.log("Sending message to Chatwoot at endpoint: ", messageEndpoint);
+
+        const response = await axios.post(messageEndpoint, messageBody, {
+            headers: {
+                'api_access_token': ctx.configuration.botToken,
+                'Content-Type': 'application/json'
+            },
+            maxBodyLength: Infinity
+        });
+
+        console.log("Response from Chatwoot: ", response.data);
+    } catch (error) {
+        console.error("Error sending message to Chatwoot: ", error.response?.data || error.message);
+        throw new RuntimeError(`Error sending message to Chatwoot! ${error}`);
+    }
 };
 
 /**
  * Prepares a message object for Chatwoot based on the provided payload and type.
- * @param payload Payload containing message content, options, etc.
- * @param messageType Type of the message, e.g., 'input_select' for dropdowns.
- * @returns A formatted message ready to be sent to Chatwoot.
  */
 export const prepareChatwootMessage = (payload: any, messageType: string) => {
     switch (messageType) {
@@ -56,54 +52,25 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
                 content: payload.text,
                 content_type: 'input_select',
                 content_attributes: {
-                    items: payload.options.map((option: any) => {
-                        return { title: option.label, value: option.value };
-                    }),
+                    items: payload.options.map((option: any) => ({ title: option.label, value: option.value })),
                 },
                 message_type: 'outgoing',
                 private: false,
             };
-        case 'image':  // Handle image
+        case 'image':
+        case 'video':
+        case 'audio':
+        case 'file':
             return {
                 content: payload.caption || '',
                 attachments: [{
-                    url: payload.imageUrl,
-                    content_type: payload.contentType || 'image/jpeg' // Dynamic content type or default
+                    url: payload[`${messageType}Url`],
+                    content_type: payload.contentType || guessContentTypeFromUrl(payload[`${messageType}Url`]),
                 }],
                 message_type: 'outgoing',
                 private: false,
             };
-        case 'video':  // Handle video
-            return {
-                content: payload.caption || '',
-                attachments: [{
-                    url: payload.videoUrl,
-                    content_type: payload.contentType || 'video/mp4' // Dynamic content type or default
-                }],
-                message_type: 'outgoing',
-                private: false,
-            };
-        case 'audio':  // Handle audio
-            return {
-                content: payload.caption || '',
-                attachments: [{
-                    url: payload.audioUrl,
-                    content_type: payload.contentType || 'audio/mpeg' // Dynamic content type or default
-                }],
-                message_type: 'outgoing',
-                private: false,
-            };
-        case 'file':  // Handle file
-            return {
-                content: payload.caption || '',
-                attachments: [{
-                    url: payload.fileUrl,
-                    content_type: payload.contentType || 'application/octet-stream' // Dynamic content type or default
-                }],
-                message_type: 'outgoing',
-                private: false,
-            };
-        case 'bloc':  // Corrected from 'block' to 'bloc'
+        case 'bloc':
             return {
                 content: payload.text || '',
                 attachments: payload.attachments || [],
@@ -138,39 +105,54 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
  */
 export const uploadMediaToChatwoot = async (mediaUrl: string, ctx: any, conversation: any, mediaType: string) => {
     try {
-        console.log(`Handling ${mediaType} upload:`, mediaUrl);
+        console.log(`Uploading ${mediaType} from URL: ${mediaUrl}`);
 
-        // Fetch media from the provided URL and create a stream
-        const response = await axios.get(mediaUrl, {
-            responseType: 'stream',
-        });
+        // Fetch media as a stream
+        const response = await axios.get(mediaUrl, { responseType: 'stream' });
 
-        // Prepare the form data with the media stream
+        // Validate if media was fetched correctly
+        if (!response.data) {
+            throw new Error(`Failed to fetch media from ${mediaUrl}`);
+        }
+
         const formData = new FormData();
         formData.append('attachments[]', response.data, {
             filename: `${mediaType}.${mediaUrl.split('.').pop() || 'media'}`,
-            contentType: response.headers['content-type'], // Dynamically set the content-type
+            contentType: response.headers['content-type'], // Dynamic content type
         });
         formData.append('message_type', 'outgoing');
 
-        // Get the Chatwoot conversation ID from conversation tags
-        const chatwootConversationId = conversation.tags.chatwootId;
-        const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/messages`;
+        const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
 
-        // Make the POST request to Chatwoot
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
                 ...formData.getHeaders(),
             },
-            maxBodyLength: Infinity, // Handle large files
+            maxBodyLength: Infinity,
         };
 
-        await axios.post(messageEndpoint, formData, config);
-        console.log(`${mediaType} sent successfully to Chatwoot`);
+        const mediaResponse = await axios.post(messageEndpoint, formData, config);
+        console.log(`${mediaType} uploaded successfully. Response:`, mediaResponse.data);
     } catch (error) {
-        throw new RuntimeError(
-            `Error sending ${mediaType} to Chatwoot! ${error}`
-        );
+        console.error(`Error uploading ${mediaType} to Chatwoot: ${error.message || error}`);
+        throw new RuntimeError(`Error sending ${mediaType} to Chatwoot! ${error}`);
+    }
+};
+
+/**
+ * Helper function to determine the content type dynamically based on media type.
+ */
+const guessContentTypeFromUrl = (mediaUrl: string) => {
+    const extension = mediaUrl.split('.').pop()?.toLowerCase();
+    switch (extension) {
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'mp4': return 'video/mp4';
+        case 'mp3': return 'audio/mpeg';
+        case 'pdf': return 'application/pdf';
+        default: return 'application/octet-stream';
     }
 };

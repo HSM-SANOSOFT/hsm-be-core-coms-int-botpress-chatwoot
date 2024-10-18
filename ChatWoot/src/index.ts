@@ -3,6 +3,7 @@ import * as bp from '.botpress';
 import { Integration, RuntimeError } from '@botpress/sdk';
 import { handleIncomingRequest } from './handler';
 import { sendOutgoingMessage } from './msn/outgoing-messages';
+import axios from 'axios';
 
 export default new bp.Integration({
   register: async ({ }) => { },
@@ -19,23 +20,27 @@ export default new bp.Integration({
 
       const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/toggle_status`;
       console.log("Endpoint: ", endpoint);
-      await axios.post(endpoint, {
-        status: 'open',
-      }, {
-        headers: {
-          'api_access_token': ctx.configuration.botToken,
-          'Content-Type': 'application/json'
-        },
-        maxBodyLength: Infinity
-      }).then((response: any) => {
-        console.log("Response For Send To Agent: ", response.data);
-      }).catch((error: any) => {
-        throw new RuntimeError(
-          `Error sending message to Chatwoot! ${error}`
-        );
-      });
 
-      return { currentStatus: 'open' };
+      try {
+        const response = await axios.post(endpoint, {
+          status: 'open',
+        }, {
+          headers: {
+            'api_access_token': ctx.configuration.botToken,
+            'Content-Type': 'application/json'
+          },
+          maxBodyLength: Infinity
+        });
+
+        console.log("Response For Send To Agent: ", response.data);
+        return { currentStatus: 'open' };
+
+      } catch (error) {
+        console.error(`Error sending to agent: ${error}`);
+        throw new RuntimeError(
+          `Error sending to agent! ${error}`
+        );
+      }
     },
   },
   channels: {
@@ -45,10 +50,10 @@ export default new bp.Integration({
         text: async (params) => { await sendOutgoingMessage({ ...params, type: 'text' }); },
         choice: async (params) => { await sendOutgoingMessage({ ...params, type: 'choice' }); },
         dropdown: async (params) => { await sendOutgoingMessage({ ...params, type: 'dropdown' }); },
-        image: async (params) => { await sendOutgoingMessage({ ...params, type: 'image' }); },  // Updated from 'media'
-        video: async (params) => { await sendOutgoingMessage({ ...params, type: 'video' }); },  // Updated from 'media'
-        audio: async (params) => { await sendOutgoingMessage({ ...params, type: 'audio' }); },  // Updated from 'media'
-        file: async (params) => { await sendOutgoingMessage({ ...params, type: 'file' }); },    // Updated from 'media'
+        image: async (params) => { await sendOutgoingMessage({ ...params, type: 'image' }); },
+        video: async (params) => { await sendOutgoingMessage({ ...params, type: 'video' }); },
+        audio: async (params) => { await sendOutgoingMessage({ ...params, type: 'audio' }); },
+        file: async (params) => { await sendOutgoingMessage({ ...params, type: 'file' }); },
         markdown: async (params) => { await sendOutgoingMessage({ ...params, type: 'markdown' }); },
         bloc: async (params) => { await sendOutgoingMessage({ ...params, type: 'block' }); },
         carousel: async (params) => { await sendOutgoingMessage({ ...params, type: 'carousel' }); },

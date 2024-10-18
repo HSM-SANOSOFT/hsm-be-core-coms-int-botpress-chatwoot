@@ -50,26 +50,24 @@ export interface FilePayload {
     caption?: string;
 }
 
-// Additional message types from your original code
+// Carousel and Card Payload Adjustments
 export interface CarouselPayload {
     type: 'carousel';
-    content: string;
-    items: CarouselItem[];
+    items: CarouselItem[];  // List of carousel items
 }
 
 export interface CarouselItem {
-    title: string;
-    subtitle?: string;
-    imageUrl?: string;
-    actions?: Action[];
+    headerImageUrl?: string;  // Optional image for the card header
+    body: string;             // Card description
+    buttons: Action[];        // Up to 2 buttons per card
 }
 
 export interface CardPayload {
     type: 'card';
-    title: string;
-    subtitle?: string;
-    imageUrl?: string;
-    actions?: Action[];
+    headerImageUrl?: string;  // Optional image for the card header
+    title: string;            // Main title of the card
+    subtitle?: string;        // Subtitle (optional)
+    buttons: Action[];        // Up to 2 action buttons (URL or postback)
 }
 
 export interface LocationPayload {

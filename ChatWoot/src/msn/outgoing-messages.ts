@@ -41,6 +41,15 @@ export const sendOutgoingMessage = async (params) => {
             case 'file':
                 await sendMediaMessage(message, messageEndpoint, ctx, 'file');
                 break;
+            case 'location':
+                await sendLocationMessage(message, messageEndpoint, ctx);
+                break;
+            case 'card':
+                await sendCardMessage(message, messageEndpoint, ctx);
+                break;
+            case 'carousel':
+                await sendCarouselMessage(message, messageEndpoint, ctx);
+                break;
             default:
                 throw new Error(`Unsupported message type: ${message.type}`);
         }
@@ -97,7 +106,6 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
 // Send a media message (image, video, audio, or file)
 const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string) => {
     try {
-        // Determine the correct media URL based on the media type
         let mediaUrl: string | undefined;
 
         switch (mediaType) {
@@ -130,34 +138,78 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         // Prepare form data to send to Chatwoot
         const formData = new FormData();
 
-        // Add content field (caption or description for media)
         if (message.payload?.caption) {
             formData.append('content', message.payload?.caption);
         } else {
-            formData.append('content', ''); // Default to empty string if no caption
+            formData.append('content', '');
         }
 
-        // Add the media file to 'attachments[]'
         formData.append('attachments[]', response.data, {
-            filename: 'media', // You can change this dynamically based on media type or URL
+            filename: 'media',
             contentType: response.headers['content-type'],
         });
 
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
-                ...formData.getHeaders(), // Ensure proper multipart/form-data headers
+                ...formData.getHeaders(),
             },
-            maxBodyLength: Infinity, // Handle large files
+            maxBodyLength: Infinity,
         };
 
-        // Send the media message to Chatwoot
         const mediaResponse = await axios.post(endpoint, formData, config);
         console.log(`${mediaType} message sent successfully. Response:`, mediaResponse.data);
     } catch (error) {
         console.error(`Error sending ${mediaType} message: ${error.message}`);
         throw new Error(`Error sending ${mediaType} message: ${error}`);
     }
+};
+
+// Send a location message
+const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
+    const { latitude, longitude, name, address } = message.payload;
+    const messageBody = {
+        message_type: 'outgoing',
+        content_type: 'location',
+        content_attributes: {
+            latitude,
+            longitude,
+            name,
+            address
+        },
+        private: false
+    };
+    await sendToChatwoot(messageBody, endpoint, ctx);
+};
+
+// Send a card message
+const sendCardMessage = async (message: any, endpoint: string, ctx: any) => {
+    const messageBody = {
+        content: message.payload?.body || '',
+        attachments: [{
+            url: message.payload?.headerImageUrl || '',
+            content_type: 'image/jpeg'
+        }],
+        message_type: 'outgoing',
+        private: false,
+        buttons: message.payload?.buttons || []
+    };
+    await sendToChatwoot(messageBody, endpoint, ctx);
+};
+
+// Send a carousel message
+const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => {
+    const messageBody = message.payload.items.map((item: any) => ({
+        content: item.body,
+        attachments: [{
+            url: item.headerImageUrl || '',
+            content_type: 'image/jpeg'
+        }],
+        message_type: 'outgoing',
+        private: false,
+        buttons: item.buttons || []
+    }));
+    await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
 // Helper function to send message to Chatwoot

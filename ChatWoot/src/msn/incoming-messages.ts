@@ -82,6 +82,23 @@ export const handleIncomingMessage = async (
                 messageType = 'text';
                 payload = { text: content }; // Defaulting to text if unknown attachment type
             }
+        } else if (data?.location) {
+            // Handling location messages
+            messageType = 'location';
+            const { latitude, longitude, name, address } = data.location;
+            payload = { latitude, longitude, name, address };
+        } else if (data?.interactive?.type === 'card') {
+            // Handling card messages
+            messageType = 'card';
+            payload = {
+                headerImageUrl: data.interactive?.header?.imageUrl || '',
+                body: data.interactive?.body?.text || '',
+                buttons: data.interactive?.footer?.buttons || []
+            };
+        } else if (data?.interactive?.type === 'carousel') {
+            // Handling carousel messages
+            messageType = 'carousel';
+            payload = data.interactive?.carousel || []; // Array of carousel items
         } else {
             // Handling text messages
             messageType = 'text';
