@@ -7,7 +7,7 @@ import FormData from 'form-data';
 
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
-    console.log("Debugging in sendOutgoingMessage - Conversation Object:", conversation);
+    console.log("Debugging in sendOutgoingMessage - Message Object:", message);
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }

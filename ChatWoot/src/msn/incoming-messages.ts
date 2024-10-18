@@ -52,8 +52,6 @@ export const handleIncomingMessage = async (
             },
         });
 
-        console.log('Conversation Retrieved or Created:', conversation);
-
         if (!conversation || !conversation.tags) {
             throw new RuntimeError('Conversation or its tags are not properly defined');
         }
