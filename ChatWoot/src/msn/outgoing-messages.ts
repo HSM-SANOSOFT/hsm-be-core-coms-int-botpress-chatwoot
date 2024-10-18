@@ -87,16 +87,31 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
 };
 
 // Send a media message
+// Send a media message
 const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
     try {
+        if (!message.url) {
+            throw new Error('Media message is missing URL.');
+        }
+
+        // Download the media file from the provided URL
+        console.log("Attempting to download media from URL:", message.url);
         const response = await axios.get(message.url, { responseType: 'stream' });
+
+        // Prepare the form data with media and caption
         const formData = new FormData();
         formData.append('attachments[]', response.data, {
             filename: message.caption || 'media',
             contentType: response.headers['content-type'],
         });
-        formData.append('message_type', 'outgoing');
 
+        // Set the message type and other properties
+        formData.append('message_type', 'outgoing');
+        if (message.caption) {
+            formData.append('content', message.caption);
+        }
+
+        // Set the request headers, including form-data specific headers
         const config = {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
@@ -105,14 +120,21 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any) => {
             maxBodyLength: Infinity,
         };
 
-        console.log("Message Endpoint:", endpoint);
+        console.log("Sending media message to endpoint:", endpoint);
+        console.log("Form data headers:", formData.getHeaders());
+
+        // Send the media message to Chatwoot
         const mediaResponse = await axios.post(endpoint, formData, config);
-        console.log("Request Response:", mediaResponse.data);
+        console.log("Media message sent successfully. Request Response:", mediaResponse.data);
     } catch (error) {
-        console.error(`Error sending media message: ${error}`);
+        console.error(`Error sending media message. Details: ${error.message}`);
+        if (error.response) {
+            console.error(`Response data: ${JSON.stringify(error.response.data)}`);
+        }
         throw new Error(`Error sending media message: ${error}`);
     }
 };
+
 
 // Helper function to send the message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {

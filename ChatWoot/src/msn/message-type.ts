@@ -69,7 +69,7 @@ export interface MarkdownPayload {
 }
 
 export interface BlockPayload {
-    type: 'block';
+    type: 'bloc';
     text: string;
     attachments?: any[];
 }
