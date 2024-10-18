@@ -16,7 +16,7 @@ export default new bp.Integration({
   register: async () => {
 
   },
-  unregister: async () => {},
+  unregister: async () => { },
   actions: {
     startConversation: async ({ ctx, input, client, logger }) => {
       const phoneNumberId: string | undefined = input.senderPhoneNumberId || ctx.configuration.whatsapp.phoneNumberId
@@ -42,7 +42,7 @@ export default new bp.Integration({
     },
     sendToAgent: async (entries) => {
       console.log("Sending to agent")
-      const {input, ctx, client} = entries;
+      const { input, ctx, client } = entries;
       const userState = await client.getState({
         type: 'user',
         name: 'chatwoot',
@@ -57,17 +57,18 @@ export default new bp.Integration({
       const response = await axios.post(endpoint, {
         status: 'open',
       }, {
-        headers: { 
-          'api_access_token': ctx.configuration.chatwoot?.botToken, 
+        headers: {
+          'api_access_token': ctx.configuration.chatwoot?.botToken,
           'Content-Type': 'application/json'
         },
         maxBodyLength: Infinity
-      }).then((response:any) => {
+      }).then((response: any) => {
         console.log("Response For Send To Agent: ", response.data);
-      }).catch((error:any) => {
+      }).catch((error: any) => {
         throw new RuntimeError(
-        `Error sending message to Chatwoot! ${error}`
-      )}
+          `Error sending message to Chatwoot! ${error}`
+        )
+      }
       )
 
       return { currentStatus: 'open' };
@@ -120,21 +121,21 @@ export default new bp.Integration({
           })
         },
         carousel: async ({ payload, ...props }) => {
-          for (const card of payload.items) {
-            if (card.imageUrl) {
+          for (const cards of payload.items) {
+            if (cards.imageUrl) {
               await outgoing.send({
                 ...props,
-                message: new Image(card.imageUrl),
+                message: new Image(cards.imageUrl),
               })
             } else {
               await outgoing.send({
                 ...props,
-                message: new Text(card.title),
+                message: new Text(cards.title),
               })
             }
           }
         },
-        card: async ({ payload, ...props }) => {
+        cards: async ({ payload, ...props }) => {
           await outgoing.send({
             ...props,
             message: new Text(payload.title),

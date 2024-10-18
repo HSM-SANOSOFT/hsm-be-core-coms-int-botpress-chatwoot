@@ -50,7 +50,7 @@ export interface FilePayload {
     caption?: string;
 }
 
-// Carousel and Card Payload Adjustments
+// Carousel and Cards Payload Adjustments
 export interface CarouselPayload {
     type: 'carousel';
     items: CarouselItem[];  // List of carousel items
@@ -62,8 +62,8 @@ export interface CarouselItem {
     buttons: Action[];        // Up to 2 buttons per card
 }
 
-export interface CardPayload {
-    type: 'card';
+export interface CardsPayload {
+    type: 'cards';  // Updated to 'cards' for plural
     headerImageUrl?: string;  // Optional image for the card header
     title: string;            // Main title of the card
     subtitle?: string;        // Subtitle (optional)
@@ -118,7 +118,7 @@ export type Message =
     | AudioPayload
     | FilePayload
     | CarouselPayload
-    | CardPayload
+    | CardsPayload  // Updated from 'CardPayload' to 'CardsPayload'
     | LocationPayload
     | MarkdownPayload
     | BlockPayload

@@ -41,14 +41,14 @@ export const sendOutgoingMessage = async (params) => {
             case 'file':
                 await sendMediaMessage(message, messageEndpoint, ctx, 'file');
                 break;
-            case 'location':
-                await sendLocationMessage(message, messageEndpoint, ctx);
-                break;
-            case 'card':
-                await sendCardMessage(message, messageEndpoint, ctx);
+            case 'cards':  // Updated to use 'cards' instead of 'card'
+                await sendCardsMessage(message, messageEndpoint, ctx);
                 break;
             case 'carousel':
                 await sendCarouselMessage(message, messageEndpoint, ctx);
+                break;
+            case 'location':
+                await sendLocationMessage(message, messageEndpoint, ctx);
                 break;
             default:
                 throw new Error(`Unsupported message type: ${message.type}`);
@@ -109,20 +109,11 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         let mediaUrl: string | undefined;
 
         switch (mediaType) {
-            case 'image':
-                mediaUrl = message.payload?.imageUrl;
-                break;
-            case 'video':
-                mediaUrl = message.payload?.videoUrl;
-                break;
-            case 'audio':
-                mediaUrl = message.payload?.audioUrl;
-                break;
-            case 'file':
-                mediaUrl = message.payload?.fileUrl;
-                break;
-            default:
-                throw new Error(`Unsupported media type: ${mediaType}`);
+            case 'image': mediaUrl = message.payload?.imageUrl; break;
+            case 'video': mediaUrl = message.payload?.videoUrl; break;
+            case 'audio': mediaUrl = message.payload?.audioUrl; break;
+            case 'file': mediaUrl = message.payload?.fileUrl; break;
+            default: throw new Error(`Unsupported media type: ${mediaType}`);
         }
 
         if (!mediaUrl) {
@@ -131,17 +122,15 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
         console.log(`Fetching ${mediaType} from URL:`, mediaUrl);
 
-        // Download media from the provided URL
         const response = await axios.get(mediaUrl, { responseType: 'stream' });
         console.log(`${mediaType} fetched successfully from URL:`, mediaUrl);
 
-        // Prepare form data to send to Chatwoot
         const formData = new FormData();
 
         if (message.payload?.caption) {
             formData.append('content', message.payload?.caption);
         } else {
-            formData.append('content', '');
+            formData.append('content', ''); // Default to empty string if no caption
         }
 
         formData.append('attachments[]', response.data, {
@@ -165,50 +154,59 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
     }
 };
 
-// Send a location message
-const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
-    const { latitude, longitude, name, address } = message.payload;
-    const messageBody = {
-        message_type: 'outgoing',
-        content_type: 'location',
-        content_attributes: {
-            latitude,
-            longitude,
-            name,
-            address
-        },
-        private: false
-    };
-    await sendToChatwoot(messageBody, endpoint, ctx);
-};
+// Send a cards message
+const sendCardsMessage = async (message: any, endpoint: string, ctx: any) => {
+    const contentType = guessContentTypeFromUrl(message.payload?.imageUrl); // Dynamically guess content type
 
-// Send a card message
-const sendCardMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.payload?.body || '',
+        content: message.payload?.title || 'No title provided', // Use the title or a default
         attachments: [{
-            url: message.payload?.headerImageUrl || '',
-            content_type: 'image/jpeg'
+            url: message.payload?.imageUrl || '',
+            content_type: contentType // Dynamically set the content type
         }],
         message_type: 'outgoing',
         private: false,
-        buttons: message.payload?.buttons || []
+        buttons: message.payload?.actions || [] // Attach buttons/actions
     };
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
 // Send a carousel message
 const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => {
-    const messageBody = message.payload.items.map((item: any) => ({
-        content: item.body,
-        attachments: [{
-            url: item.headerImageUrl || '',
-            content_type: 'image/jpeg'
-        }],
+    const items = message.payload?.items.map(item => ({
+        title: item.title,
+        subtitle: item.subtitle || '',
+        image: {
+            url: item.imageUrl || '',
+            content_type: guessContentTypeFromUrl(item.imageUrl) // Dynamically set the content type
+        },
+        actions: item.actions || []
+    }));
+
+    const messageBody = {
+        content: 'Carousel Message',
         message_type: 'outgoing',
         private: false,
-        buttons: item.buttons || []
-    }));
+        content_attributes: {
+            items: items || []
+        },
+    };
+    await sendToChatwoot(messageBody, endpoint, ctx);
+};
+
+// Send a location message
+const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
+    const messageBody = {
+        message_type: 'outgoing',
+        content_type: 'location',
+        content_attributes: {
+            latitude: message.payload?.latitude,
+            longitude: message.payload?.longitude,
+            name: message.payload?.title || 'Location', // Ensure title is sent
+            address: message.payload?.address || 'No address provided', // Fallback for address
+        },
+        private: false
+    };
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
@@ -226,5 +224,21 @@ const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
     } catch (error) {
         console.error(`Error sending message to Chatwoot: ${error}`);
         throw new Error(`Error sending message to Chatwoot: ${error}`);
+    }
+};
+
+// Helper function to dynamically guess content type from the URL
+const guessContentTypeFromUrl = (mediaUrl: string) => {
+    const extension = mediaUrl.split('.').pop()?.toLowerCase();
+    switch (extension) {
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'webp': return 'image/webp';
+        case 'mp4': return 'video/mp4';
+        case 'mp3': return 'audio/mpeg';
+        case 'pdf': return 'application/pdf';
+        default: return 'application/octet-stream';
     }
 };

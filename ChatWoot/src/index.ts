@@ -57,7 +57,7 @@ export default new bp.Integration({
         markdown: async (params) => { await sendOutgoingMessage({ ...params, type: 'markdown' }); },
         bloc: async (params) => { await sendOutgoingMessage({ ...params, type: 'block' }); },
         carousel: async (params) => { await sendOutgoingMessage({ ...params, type: 'carousel' }); },
-        card: async (params) => { await sendOutgoingMessage({ ...params, type: 'card' }); },
+        card: async (params) => { await sendOutgoingMessage({ ...params, type: 'cards' }); },  // Updated from 'card' to 'cards'
         location: async (params) => { await sendOutgoingMessage({ ...params, type: 'location' }); },
       },
     },

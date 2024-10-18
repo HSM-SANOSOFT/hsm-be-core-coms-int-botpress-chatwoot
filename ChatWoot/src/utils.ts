@@ -11,7 +11,7 @@ import FormData from 'form-data';
 export const sendToChatwoot = async (messageBody: any, ctx: any, conversation: any) => {
     try {
         const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversation.tags.chatwootId}/messages`;
-
+        
         console.log("Sending message to Chatwoot at endpoint: ", messageEndpoint);
 
         const response = await axios.post(messageEndpoint, messageBody, {
@@ -21,7 +21,7 @@ export const sendToChatwoot = async (messageBody: any, ctx: any, conversation: a
             },
             maxBodyLength: Infinity
         });
-
+        
         console.log("Response from Chatwoot: ", response.data);
     } catch (error) {
         console.error("Error sending message to Chatwoot: ", error.response?.data || error.message);
@@ -106,7 +106,7 @@ export const prepareChatwootMessage = (payload: any, messageType: string) => {
 export const uploadMediaToChatwoot = async (mediaUrl: string, ctx: any, conversation: any, mediaType: string) => {
     try {
         console.log(`Uploading ${mediaType} from URL: ${mediaUrl}`);
-
+        
         // Fetch media as a stream
         const response = await axios.get(mediaUrl, { responseType: 'stream' });
 

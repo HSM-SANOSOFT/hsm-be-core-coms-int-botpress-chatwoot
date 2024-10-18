@@ -87,9 +87,9 @@ export const handleIncomingMessage = async (
             messageType = 'location';
             const { latitude, longitude, name, address } = data.location;
             payload = { latitude, longitude, name, address };
-        } else if (data?.interactive?.type === 'card') {
-            // Handling card messages
-            messageType = 'card';
+        } else if (data?.interactive?.type === 'cards') {
+            // Handling cards messages (updated from 'card')
+            messageType = 'cards';
             payload = {
                 headerImageUrl: data.interactive?.header?.imageUrl || '',
                 body: data.interactive?.body?.text || '',
