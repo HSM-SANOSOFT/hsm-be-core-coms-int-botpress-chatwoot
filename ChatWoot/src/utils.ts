@@ -1,4 +1,4 @@
-// File: src/utils.ts
+// File: ChatWoot/src/utils.ts
 
 import axios from 'axios';
 import { RuntimeError } from '@botpress/sdk';

@@ -1,8 +1,8 @@
-// File: src/msn/outgoing-messages.ts
+// File: ChatWoot/src/msn/outgoing-messages.ts
 
 import axios from 'axios';
 import { IntegrationContext } from '@botpress/sdk';
-import { Message } from './message-types';
+import { Message } from './message-type';
 import FormData from 'form-data';
 
 export const sendOutgoingMessage = async (

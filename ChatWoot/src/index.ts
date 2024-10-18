@@ -1,4 +1,4 @@
-// File: src/index.ts
+// File: ChatWoot/src/index.ts
 
 import * as sdk from '@botpress/sdk';
 import * as bp from '.botpress';

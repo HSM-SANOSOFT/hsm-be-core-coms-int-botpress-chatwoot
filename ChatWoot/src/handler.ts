@@ -1,4 +1,4 @@
-// File: src/handler.ts
+// File: ChatWoot/src/handler.ts
 
 import { IntegrationProps } from '@botpress/sdk';
 import { handleIncomingMessage } from './msn/incoming-messages';

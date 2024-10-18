@@ -1,6 +1,6 @@
-// File: src/msn/incoming-messages.ts
+// File: ChatWoot/src/msn/incoming-messages.ts
 
-import { IntegrationContext, Client } from '@botpress/sdk';
+import { IntegrationContext, Client, RuntimeError } from '@botpress/sdk';
 
 export const handleIncomingMessage = async (
     data: any,
@@ -42,29 +42,43 @@ export const handleIncomingMessage = async (
         };
     }
 
-    const { conversation } = await client.getOrCreateConversation({
-        channel: 'chatwoot',
-        tags: {
-            chatwootId: `${conversationId}`,
-            inboxId: `${inboxId}`,
-            platform: `${platform}`,
-        },
-    });
+    try {
+        const { conversation } = await client.getOrCreateConversation({
+            channel: 'chatwoot',
+            tags: {
+                chatwootId: `${conversationId}`,
+                inboxId: `${inboxId}`,
+                platform: `${platform}`,
+            },
+        });
 
-    const { user } = await client.getOrCreateUser({
-        tags: { chatwootId: `${userId}` },
-    });
+        console.log('Conversation Retrieved or Created:', conversation);
 
-    await client.createMessage({
-        tags: { chatwootId: `${messageId}` },
-        type: 'text',
-        userId: user.id,
-        conversationId: conversation.id,
-        payload: { text: content },
-    });
+        if (!conversation || !conversation.tags) {
+            throw new RuntimeError('Conversation or its tags are not properly defined');
+        }
 
-    return {
-        status: 200,
-        body: 'Message received',
-    };
+        const { user } = await client.getOrCreateUser({
+            tags: { chatwootId: `${userId}` },
+        });
+
+        await client.createMessage({
+            tags: { chatwootId: `${messageId}` },
+            type: 'text',
+            userId: user.id,
+            conversationId: conversation.id,
+            payload: { text: content },
+        });
+
+        return {
+            status: 200,
+            body: 'Message received',
+        };
+    } catch (error) {
+        console.error('Error handling conversation or user creation:', error);
+        return {
+            status: 500,
+            body: 'Internal server error',
+        };
+    }
 };
