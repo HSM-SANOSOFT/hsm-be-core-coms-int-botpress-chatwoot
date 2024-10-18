@@ -5,11 +5,8 @@ import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
 import FormData from 'form-data';
 
-export const sendOutgoingMessage = async (
-    message: Message,
-    ctx: IntegrationContext,
-    conversation: any
-) => {
+export const sendOutgoingMessage = async (params) => {
+    const { ctx, conversation, message, type, client } = params;
     console.log("Debugging in sendOutgoingMessage - Conversation Object:", conversation);
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
