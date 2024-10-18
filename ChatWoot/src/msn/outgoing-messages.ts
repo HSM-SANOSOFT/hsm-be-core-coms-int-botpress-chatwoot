@@ -10,6 +10,9 @@ export const sendOutgoingMessage = async (
     ctx: IntegrationContext,
     conversation: any
 ) => {
+    console.log("Debugging in sendOutgoingMessage - Conversation Object:", conversation);
+    console.log("Debugging in sendOutgoingMessage - Message Object:", message);
+    
     const chatwootConversationId = conversation.tags.chatwootId; // Updated to use conversation.id directly
     const messageEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/messages`;
 
