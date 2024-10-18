@@ -194,6 +194,7 @@ const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => 
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
+
 // Send a location message
 const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
@@ -209,6 +210,7 @@ const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => 
     };
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
+
 
 // Helper function to send message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
