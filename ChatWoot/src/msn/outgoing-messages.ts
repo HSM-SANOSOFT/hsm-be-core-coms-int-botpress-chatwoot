@@ -53,7 +53,7 @@ export const sendOutgoingMessage = async (params) => {
 // Send a text message
 const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        content: message.content,
+        content: message.payload?.text,
         message_type: 'outgoing',
         private: false,
     };
@@ -66,7 +66,7 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
         content: message.payload?.text,
         content_type: 'input_select',
         content_attributes: {
-            items: message.options.map((option: any) => ({
+            items: message.payload?.options.map((option: any) => ({
                 title: option.label,
                 value: option.value,
             })),
@@ -83,7 +83,7 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => 
         content: message.payload?.text,
         content_type: 'input_select',
         content_attributes: {
-            items: message.options.map((option: any) => ({
+            items: message.payload?.options.map((option: any) => ({
                 title: option.label,
                 value: option.value,
             })),
