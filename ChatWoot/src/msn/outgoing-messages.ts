@@ -2,6 +2,7 @@ import axios from 'axios';
 import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
 import FormData from 'form-data';
+import { platform } from 'os';
 
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
@@ -71,18 +72,21 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 
 // Send a choice message
 const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
-    const messageBody = {
-        content: message.payload?.text,
-        content_type: 'input_select',
-        content_attributes: {
-            items: message.payload?.options.map((option: any) => ({
-                title: option.label,
-                value: option.value,
-            })),
-        },
-        message_type: 'outgoing',
-        private: false,
-    };
+    switch(platform) {
+        default:
+            const messageBody = {
+                content: message.payload?.text,
+                content_type: 'input_select',
+                content_attributes: {
+                    items: message.payload?.options.map((option: any) => ({
+                        title: option.label,
+                        value: option.value,
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+    }
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
