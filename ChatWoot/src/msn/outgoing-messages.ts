@@ -15,6 +15,7 @@ export const sendOutgoingMessage = async (params) => {
     }
 
     const chatwootConversationId = conversation.tags?.chatwootId;
+    const platform = conversation.tags?.platform;
     if (!chatwootConversationId) {
         throw new Error("chatwootConversationId is undefined or null in sendOutgoingMessage.");
     }
@@ -27,10 +28,10 @@ export const sendOutgoingMessage = async (params) => {
                 await sendTextMessage(message, messageEndpoint, ctx);
                 break;
             case 'choice':
-                await sendChoiceMessage(message, messageEndpoint, ctx);
+                await sendChoiceMessage(message, messageEndpoint, ctx,platform);
                 break;
             case 'dropdown':
-                await sendDropdownMessage(message, messageEndpoint, ctx);
+                await sendDropdownMessage(message, messageEndpoint, ctx,platform);
                 break;
             case 'image':
                 await sendMediaMessage(message, messageEndpoint, ctx, 'image');
@@ -73,39 +74,82 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 };
 
 // Send a choice message
-const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
-
-    const messageBody = {
-        content: message.payload?.text,
-        content_type: 'input_select',
-        content_attributes: {
-            items: message.payload?.options.map((option: any) => ({
-                title: option.label,
-                value: option.value,
-            })),
-        },
-        message_type: 'outgoing',
-        private: false,
-    };
+const sendChoiceMessage = async (message: any, endpoint: string, ctx: any,platform: string) => {
+    let messageBody;
+    switch (platform) {
+        case 'facebookpage':
+            // For FacebookPage, show the list as plain text, but still use input_select for backend processing
+            const listOptions = message.payload?.options.map((option: any, index: number) => {
+                return `${index + 1}. ${option.label}`;  // Format as a numbered list
+            }).join('\n');  // Join all options with a new line
+            messageBody = {
+                content: `${message.payload?.text}\n${listOptions}`,  // Text followed by the list of options
+                content_type: 'input_select',  // Still send input_select to process user selection
+                content_attributes: {
+                    items: message.payload?.options.map((option: any) => ({
+                        title: option.label,
+                        value: option.value,
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+            break;
+        default:  // WhatsApp or other platforms (default behavior)
+            messageBody = {
+                content: message.payload?.text,
+                content_type: 'input_select',
+                content_attributes: {
+                    items: message.payload?.options.map((option: any) => ({
+                        title: option.label,
+                        value: option.value,
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+            break;
+    }
     await sendToChatwoot(messageBody, endpoint, ctx);
-
-
 };
 
 // Send a dropdown message
-const sendDropdownMessage = async (message: any, endpoint: string, ctx: any) => {
-    const messageBody = {
-        content: message.payload?.text,
-        content_type: 'input_select',
-        content_attributes: {
-            items: message.payload?.options.map((option: any) => ({
-                title: option.label,
-                value: option.value,
-            })),
-        },
-        message_type: 'outgoing',
-        private: false,
-    };
+const sendDropdownMessage = async (message: any, endpoint: string, ctx: any, platform: string) => {
+    let messageBody;
+    switch (platform) {
+        case 'facebookpage':
+            // For FacebookPage, show the list as plain text, but still use input_select for backend processing
+            const listOptions = message.payload?.options.map((option: any, index: number) => {
+                return `${index + 1}. ${option.label}`;  // Format as a numbered list
+            }).join('\n');  // Join all options with a new line
+            messageBody = {
+                content: `${message.payload?.text}\n${listOptions}`,  // Text followed by the list of options
+                content_type: 'input_select',  // Still send input_select to process user selection
+                content_attributes: {
+                    items: message.payload?.options.map((option: any) => ({
+                        title: option.label,
+                        value: option.value,
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+            break;
+        default:  // WhatsApp or other platforms (default behavior)
+            messageBody = {
+                content: message.payload?.text,
+                content_type: 'input_select',
+                content_attributes: {
+                    items: message.payload?.options.map((option: any) => ({
+                        title: option.label,
+                        value: option.value,
+                    })),
+                },
+                message_type: 'outgoing',
+                private: false,
+            };
+            break;
+    }
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
 
