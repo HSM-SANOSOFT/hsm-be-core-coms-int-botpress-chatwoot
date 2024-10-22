@@ -180,7 +180,8 @@ const sendCardsMessage = async (message: any, endpoint: string, ctx: any) => {
                 }
             ]
         },
-        private: false
+        message_type: 'outgoing',
+        private: false,
     };
 
     await sendToChatwoot(messageBody, endpoint, ctx);
@@ -207,7 +208,8 @@ const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => 
         content_attributes: {
             items: items
         },
-        private: false
+        message_type: 'outgoing',
+        private: false,
     };
 
     await sendToChatwoot(messageBody, endpoint, ctx);
@@ -218,7 +220,7 @@ const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => 
 // Send a location message
 const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
     const messageBody = {
-        message_type: 'outgoing',
+        content: 'location',
         content_type: 'location',
         content_attributes: {
             latitude: message.payload?.latitude,
@@ -226,7 +228,8 @@ const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => 
             name: message.payload?.title || 'Location', // Ensure title is sent
             address: message.payload?.address || 'No address provided', // Fallback for address
         },
-        private: false
+        message_type: 'outgoing',
+        private: false,
     };
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
