@@ -28,22 +28,22 @@ export const sendOutgoingMessage = async (params) => {
                 await sendTextMessage(message, messageEndpoint, ctx);
                 break;
             case 'choice':
-                await sendChoiceMessage(message, messageEndpoint, ctx,platform);
+                await sendChoiceMessage(message, messageEndpoint, ctx, platform);
                 break;
             case 'dropdown':
-                await sendDropdownMessage(message, messageEndpoint, ctx,platform);
+                await sendDropdownMessage(message, messageEndpoint, ctx, platform);
                 break;
             case 'image':
-                await sendMediaMessage(message, messageEndpoint, ctx, 'image');
+                await sendMediaMessage(message, messageEndpoint, ctx, 'image', platform);
                 break;
             case 'video':
-                await sendMediaMessage(message, messageEndpoint, ctx, 'video');
+                await sendMediaMessage(message, messageEndpoint, ctx, 'video', platform);
                 break;
             case 'audio':
-                await sendMediaMessage(message, messageEndpoint, ctx, 'audio');
+                await sendMediaMessage(message, messageEndpoint, ctx, 'audio', platform);
                 break;
             case 'file':
-                await sendMediaMessage(message, messageEndpoint, ctx, 'file');
+                await sendMediaMessage(message, messageEndpoint, ctx, 'file', platform);
                 break;
             case 'cards':  // Updated to use 'cards' instead of 'card'
                 await sendCardsMessage(message, messageEndpoint, ctx);
@@ -154,7 +154,7 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any, pla
 };
 
 // Send a media message (image, video, audio, or file)
-const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string) => {
+const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string, platform: string) => {
     try {
         let mediaUrl: string | undefined;
 
@@ -170,8 +170,24 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
             throw new Error(`Media URL is missing for type: ${mediaType}`);
         }
 
-        console.log(`Fetching ${mediaType} from URL:`, mediaUrl);
+        console.log(`Processing ${mediaType} from URL:`, mediaUrl);
 
+        // Platform-specific logic for file type and FacebookPage
+        if (platform === 'facebookpage' && mediaType === 'file') {
+            // For Facebook Messenger, send the file as a link instead of an attachment
+            const messageBody = {
+                content: `Puedes descargar el archivo aquí: [Descargar Archivo](${mediaUrl})`,
+                message_type: 'outgoing',
+                private: false,
+            };
+
+            // Send the message body as a link to Chatwoot
+            await sendToChatwoot(messageBody, endpoint, ctx);
+            console.log(`File sent as link for FacebookPage: ${mediaUrl}`);
+            return;
+        }
+
+        // Fetch media for other types or platforms
         const response = await axios.get(mediaUrl, { responseType: 'stream' });
         console.log(`${mediaType} fetched successfully from URL:`, mediaUrl);
 
@@ -203,6 +219,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         throw new Error(`Error sending ${mediaType} message: ${error}`);
     }
 };
+
 
 // Send a cards message
 const sendCardsMessage = async (message: any, endpoint: string, ctx: any) => {
