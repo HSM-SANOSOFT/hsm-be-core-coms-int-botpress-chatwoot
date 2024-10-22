@@ -174,16 +174,19 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
         // Platform-specific logic for file type and FacebookPage
         if (platform === 'facebookpage' && mediaType === 'file') {
-            // For Facebook Messenger, send the file as a link instead of an attachment
+            // Shorten the media URL using TinyURL API
+            const shortenedUrl = await shortenUrl(mediaUrl);
+
+            // For Facebook Messenger, send the file as a shortened link
             const messageBody = {
-                content: `Puedes descargar el archivo aquí: [Descargar Archivo](${mediaUrl})`,
+                content: `Puedes descargar el archivo aquí: [Descargar Archivo](${shortenedUrl})`,
                 message_type: 'outgoing',
                 private: false,
             };
 
             // Send the message body as a link to Chatwoot
             await sendToChatwoot(messageBody, endpoint, ctx);
-            console.log(`File sent as link for FacebookPage: ${mediaUrl}`);
+            console.log(`File sent as link for FacebookPage: ${shortenedUrl}`);
             return;
         }
 
@@ -217,6 +220,17 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
     } catch (error) {
         console.error(`Error sending ${mediaType} message: ${error.message}`);
         throw new Error(`Error sending ${mediaType} message: ${error}`);
+    }
+};
+
+// Helper function to shorten URL using TinyURL
+const shortenUrl = async (url: string): Promise<string> => {
+    try {
+        const responseURL = await axios.get(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`);
+        return responseURL.data;
+    } catch (error) {
+        console.error(`Error shortening URL: ${error.message}`);
+        return url; // If the URL shortening fails, return the original URL
     }
 };
 
