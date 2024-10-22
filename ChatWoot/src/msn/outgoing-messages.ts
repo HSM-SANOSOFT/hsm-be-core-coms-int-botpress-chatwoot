@@ -80,7 +80,7 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any,platfo
         case 'facebookpage':
             // For FacebookPage, show the list as plain text, but still use input_select for backend processing
             const listOptions = message.payload?.options.map((option: any, index: number) => {
-                return `${index + 1}. ${option.label}`;  // Format as a numbered list
+                return `${option.label}`;  // Format as a numbered list
             }).join('\n');  // Join all options with a new line
             messageBody = {
                 content: `${message.payload?.text}\n${listOptions}`,  // Text followed by the list of options
@@ -120,7 +120,7 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any, pla
         case 'facebookpage':
             // For FacebookPage, show the list as plain text, but still use input_select for backend processing
             const listOptions = message.payload?.options.map((option: any, index: number) => {
-                return `${index + 1}. ${option.label}`;  // Format as a numbered list
+                return `${option.label}`;  // Format as a numbered list
             }).join('\n');  // Join all options with a new line
             messageBody = {
                 content: `${message.payload?.text}\n${listOptions}`,  // Text followed by the list of options
@@ -261,23 +261,29 @@ const sendCarouselMessage = async (message: any, endpoint: string, ctx: any) => 
 
 
 
-// Send a location message
+// Send a location message as a link
 const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => {
+    // Generate Google Maps link based on coordinates
+    const latitude = message.payload?.latitude;
+    const longitude = message.payload?.longitude;
+
+    if (!latitude || !longitude) {
+        throw new Error("Latitude and longitude are required to generate a Google Maps link.");
+    }
+
+    const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    const locationName = message.payload?.title || 'Location';
+    const address = message.payload?.address || 'No address provided';
+
+    // Create message content with the link and other location details
     const messageBody = {
-        content: 'location',
-        content_type: 'location',
-        content_attributes: {
-            latitude: message.payload?.latitude,
-            longitude: message.payload?.longitude,
-            name: message.payload?.title || 'Location', // Ensure title is sent
-            address: message.payload?.address || 'No address provided', // Fallback for address
-        },
+        content: `${locationName}\n${address}\n[View on Google Maps](${googleMapsLink})`,
         message_type: 'outgoing',
         private: false,
     };
+
     await sendToChatwoot(messageBody, endpoint, ctx);
 };
-
 
 // Helper function to send message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
