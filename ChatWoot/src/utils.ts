@@ -1,3 +1,5 @@
+//File: ChatWoot/src/utils.ts
+
 export const prepareChatwootMessage = (payload: any, messageType: string) => {
     switch (messageType) {
         case 'text':

@@ -1,3 +1,5 @@
+//File: ChatWoot/src/msn/outgoing-messages.ts
+
 import axios from 'axios';
 import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
@@ -72,22 +74,22 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 
 // Send a choice message
 const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
-    switch(platform) {
-        default:
-            const messageBody = {
-                content: message.payload?.text,
-                content_type: 'input_select',
-                content_attributes: {
-                    items: message.payload?.options.map((option: any) => ({
-                        title: option.label,
-                        value: option.value,
-                    })),
-                },
-                message_type: 'outgoing',
-                private: false,
-            };
-    }
+
+    const messageBody = {
+        content: message.payload?.text,
+        content_type: 'input_select',
+        content_attributes: {
+            items: message.payload?.options.map((option: any) => ({
+                title: option.label,
+                value: option.value,
+            })),
+        },
+        message_type: 'outgoing',
+        private: false,
+    };
     await sendToChatwoot(messageBody, endpoint, ctx);
+
+
 };
 
 // Send a dropdown message

@@ -1,3 +1,5 @@
+//File: ChatWoot/src/msn/message-type.ts
+
 export interface TextPayload {
     type: 'text';
     content: string;
