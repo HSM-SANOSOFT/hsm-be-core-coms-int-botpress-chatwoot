@@ -1,9 +1,12 @@
+//File: ChatWoot/src/index.ts
+
 import * as sdk from '@botpress/sdk';
 import * as bp from '.botpress';
 import { Integration, RuntimeError } from '@botpress/sdk';
 import { handleIncomingRequest } from './handler';
 import { sendOutgoingMessage } from './msn/outgoing-messages';
 import axios from 'axios';
+import { platform } from 'process';
 
 export default new bp.Integration({
   register: async ({ }) => { },
@@ -48,7 +51,7 @@ export default new bp.Integration({
       messages: {
         // Delegating the handling of outgoing messages to sendOutgoingMessage in outgoing-messages.ts
         text: async (params) => { await sendOutgoingMessage({ ...params, type: 'text' }); },
-        choice: async (params) => { await sendOutgoingMessage({ ...params, type: 'choice' }); },
+        choice: async (params) => { await sendOutgoingMessage({ ...params, type: 'choice'}); },
         dropdown: async (params) => { await sendOutgoingMessage({ ...params, type: 'dropdown' }); },
         image: async (params) => { await sendOutgoingMessage({ ...params, type: 'image' }); },
         video: async (params) => { await sendOutgoingMessage({ ...params, type: 'video' }); },

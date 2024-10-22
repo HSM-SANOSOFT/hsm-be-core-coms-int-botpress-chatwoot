@@ -1,3 +1,5 @@
+//File: ChatWoot/src/msn/message-type.ts
+
 export interface TextPayload {
     type: 'text';
     content: string;
@@ -89,18 +91,6 @@ export interface BlockPayload {
     attachments?: any[];
 }
 
-export interface InteractiveButtonPayload {
-    type: 'interactive_button';
-    text: string;
-    buttons: InteractiveButton[];
-}
-
-export interface InteractiveButton {
-    label: string;
-    payload: string;
-    type: 'postback' | 'url';
-}
-
 export interface Action {
     label: string;
     type: 'link' | 'button';
@@ -121,5 +111,4 @@ export type Message =
     | CardsPayload  // Updated from 'CardPayload' to 'CardsPayload'
     | LocationPayload
     | MarkdownPayload
-    | BlockPayload
-    | InteractiveButtonPayload;
+    | BlockPayload;

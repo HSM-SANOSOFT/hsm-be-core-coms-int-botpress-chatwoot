@@ -1,3 +1,5 @@
+//File: ChatWoot / src / msn / incoming - messages.ts
+
 import { IntegrationContext, Client, RuntimeError } from '@botpress/sdk';
 
 export const handleIncomingMessage = async (

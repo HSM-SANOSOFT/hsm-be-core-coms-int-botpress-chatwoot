@@ -1,7 +1,10 @@
+//File: ChatWoot/src/msn/outgoing-messages.ts
+
 import axios from 'axios';
 import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
 import FormData from 'form-data';
+import { platform } from 'os';
 
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
@@ -71,6 +74,7 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 
 // Send a choice message
 const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
+
     const messageBody = {
         content: message.payload?.text,
         content_type: 'input_select',
@@ -84,6 +88,8 @@ const sendChoiceMessage = async (message: any, endpoint: string, ctx: any) => {
         private: false,
     };
     await sendToChatwoot(messageBody, endpoint, ctx);
+
+
 };
 
 // Send a dropdown message
