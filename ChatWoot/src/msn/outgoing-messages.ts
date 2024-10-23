@@ -192,7 +192,9 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
         // Fetch media for other types or platforms
         const response = await axios.get(mediaUrl, { responseType: 'stream' });
+        const mimeType = response.headers['content-type'] || guessContentTypeFromUrl(mediaUrl); // Fallback to helper function
         console.log(`${mediaType} fetched successfully from URL:`, mediaUrl);
+
 
         const formData = new FormData();
 
@@ -204,7 +206,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
         formData.append('attachments[]', response.data, {
             filename: 'media',
-            contentType: response.headers['content-type'],
+            contentType: mimeType,
         });
 
         const config = {
@@ -231,6 +233,63 @@ const shortenUrl = async (url: string): Promise<string> => {
     } catch (error) {
         console.error(`Error shortening URL: ${error.message}`);
         return url; // If the URL shortening fails, return the original URL
+    }
+};
+
+// Helper function to dynamically guess content type from the URL
+const guessContentTypeFromUrl = (mediaUrl: string) => {
+    const extension = mediaUrl.split('.').pop()?.toLowerCase();
+    switch (extension) {
+        // Image types
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'webp': return 'image/webp';
+        case 'bmp': return 'image/bmp';
+        case 'tiff': return 'image/tiff';
+        case 'svg': return 'image/svg+xml';
+
+        // Video types
+        case 'mp4': return 'video/mp4';
+        case 'mov': return 'video/quicktime';
+        case 'avi': return 'video/x-msvideo';
+        case 'mkv': return 'video/x-matroska';
+        case 'webm': return 'video/webm';
+        case 'wmv': return 'video/x-ms-wmv';
+        case 'flv': return 'video/x-flv';
+
+        // Audio types
+        case 'mp3': return 'audio/mpeg';
+        case 'ogg': return 'audio/ogg';
+        case 'wav': return 'audio/wav';
+        case 'aac': return 'audio/aac';
+        case 'flac': return 'audio/flac';
+        case 'm4a': return 'audio/mp4';
+
+        // Document types
+        case 'pdf': return 'application/pdf';
+        case 'doc': return 'application/msword';
+        case 'docx': return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        case 'xls': return 'application/vnd.ms-excel';
+        case 'xlsx': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        case 'ppt': return 'application/vnd.ms-powerpoint';
+        case 'pptx': return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        case 'txt': return 'text/plain';
+        case 'rtf': return 'application/rtf';
+
+        // Compressed and executable files
+        case 'zip': return 'application/zip';
+        case 'rar': return 'application/vnd.rar';
+        case '7z': return 'application/x-7z-compressed';
+        case 'tar': return 'application/x-tar';
+        case 'gz': return 'application/gzip';
+        case 'exe': return 'application/x-msdownload';
+        case 'apk': return 'application/vnd.android.package-archive';
+        case 'dmg': return 'application/x-apple-diskimage';
+
+        // Default type for unknown extensions
+        default: return 'application/octet-stream';
     }
 };
 
@@ -333,18 +392,3 @@ const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
     }
 };
 
-// Helper function to dynamically guess content type from the URL
-const guessContentTypeFromUrl = (mediaUrl: string) => {
-    const extension = mediaUrl.split('.').pop()?.toLowerCase();
-    switch (extension) {
-        case 'png': return 'image/png';
-        case 'jpg':
-        case 'jpeg': return 'image/jpeg';
-        case 'gif': return 'image/gif';
-        case 'webp': return 'image/webp';
-        case 'mp4': return 'video/mp4';
-        case 'mp3': return 'audio/mpeg';
-        case 'pdf': return 'application/pdf';
-        default: return 'application/octet-stream';
-    }
-};
