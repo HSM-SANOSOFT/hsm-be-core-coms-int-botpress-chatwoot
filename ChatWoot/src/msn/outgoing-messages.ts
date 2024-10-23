@@ -74,7 +74,7 @@ const sendTextMessage = async (message: any, endpoint: string, ctx: any) => {
 };
 
 // Send a choice message
-const sendChoiceMessage = async (message: any, endpoint: string, ctx: any,platform: string) => {
+const sendChoiceMessage = async (message: any, endpoint: string, ctx: any, platform: string) => {
     let messageBody;
     switch (platform) {
         case 'facebookpage':
