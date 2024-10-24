@@ -1,4 +1,4 @@
-//File: ChatWoot / src / msn / incoming - messages.ts
+// File: ChatWoot/src/msn/incoming-messages.ts
 
 import { IntegrationContext, Client, RuntimeError } from '@botpress/sdk';
 
@@ -23,6 +23,9 @@ export const handleIncomingMessage = async (
 
     const conversationId = data?.conversation?.id;
     const userId = data?.sender?.id;
+    const userPhone = (!data?.sender?.phone_number || data?.sender?.phone_number.trim() === "") ? 'No phone provided' : data?.sender?.phone_number;
+    const userEmail = (!data?.sender?.email || data?.sender?.email.trim() === "") ? 'No email provided' : data?.sender?.email;
+    const userName = (!data?.sender?.name || data?.sender?.name.trim() === "") ? 'Unknown' : data?.sender?.name;
     const messageId = data?.id;
     const content = data?.content;
     const inboxId = data?.conversation?.inbox_id?.toString();
@@ -56,15 +59,21 @@ export const handleIncomingMessage = async (
             throw new RuntimeError('Conversation or its tags are not properly defined');
         }
 
+        // Create or update user with tags
         const { user } = await client.getOrCreateUser({
-            tags: { chatwootId: `${userId}` },
+            tags: {
+                chatwootId: `${userId}`,
+                userName: `${userName}`,  // Add user's name
+                userEmail: `${userEmail}`,  // Add user's email
+                userPhone: `${userPhone}`,  // Add user's phone number
+            },
         });
 
         // Determine the message type and handle accordingly
         let payload: any;
         let messageType: string;
 
-        if (data?.attachments?.length) {
+        if (data?.attachments?.length && data.attachments[0]) {
             const attachment = data.attachments[0];
 
             // Handling media types
@@ -91,7 +100,9 @@ export const handleIncomingMessage = async (
         }
 
         await client.createMessage({
-            tags: { chatwootId: `${messageId}` },
+            tags: { 
+                chatwootId: `${messageId}` 
+            },
             type: messageType,
             userId: user.id,
             conversationId: conversation.id,

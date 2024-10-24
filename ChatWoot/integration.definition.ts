@@ -1,12 +1,12 @@
 // File: ChatWoot/integration.definition.ts
 
-import { IntegrationDefinition, z, messages } from '@botpress/sdk'
-import { integrationName } from './package.json'
+import { IntegrationDefinition, z, messages } from '@botpress/sdk';
+import { integrationName } from './package.json';
 import { sendToAgentSchema, sendToTeamSchema } from './src/ActionDefinition/ActionsSchema'; // Import action schemas
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '5.0.0',
+  version: '5.0.1',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
@@ -45,6 +45,9 @@ export default new IntegrationDefinition({
   user: {
     tags: {
       chatwootId: {}, // Tag users with chatwootId
+      userName: {}, // Include userName tag (consider changing to 'name' for simplicity)
+      userEmail: {}, // Include userEmail tag (consider changing to 'email')
+      userPhone: {}, // Include userPhone tag (consider changing to 'phone')
     },
   },
-})
+});
