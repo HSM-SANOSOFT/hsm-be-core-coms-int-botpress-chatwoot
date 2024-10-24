@@ -23,9 +23,9 @@ export const handleIncomingMessage = async (
 
     const conversationId = data?.conversation?.id;
     const userId = data?.sender?.id;
-    const userPhone = (!data?.sender?.phone_number || data?.sender?.phone_number.trim() === "") ? 'No phone provided' : data?.sender?.phone_number;
-    const userEmail = (!data?.sender?.email || data?.sender?.email.trim() === "") ? 'No email provided' : data?.sender?.email;
-    const userName = (!data?.sender?.name || data?.sender?.name.trim() === "") ? 'Unknown' : data?.sender?.name;
+    const userPhone = (!data?.sender?.phone_number || data?.sender?.phone_number.trim() === "") ? "" : data?.sender?.phone_number;
+    const userEmail = (!data?.sender?.email || data?.sender?.email.trim() === "") ? "" : data?.sender?.email;
+    const userName = (!data?.sender?.name || data?.sender?.name.trim() === "") ? "" : data?.sender?.name;
     const messageId = data?.id;
     const content = data?.content;
     const inboxId = data?.conversation?.inbox_id?.toString();

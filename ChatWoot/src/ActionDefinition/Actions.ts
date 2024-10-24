@@ -7,12 +7,14 @@ export const sendToAgent = async ({ ctx, client, input }) => {
     const { conversation } = await client.getConversation({ id: conversationId });
     const chatwootConversationId = conversation.tags.chatwootId;
 
+    const api_access_token = ctx.configuration.botToken;
+
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/toggle_status`;
 
     try {
         const response = await axios.post(endpoint, { status: 'open' }, {
             headers: { 
-                'api_access_token': ctx.configuration.botToken, 
+                'api_access_token': api_access_token, 
                 'Content-Type': 'application/json' 
             },
             maxBodyLength: Infinity
@@ -32,6 +34,8 @@ export const sendToTeam = async ({ ctx, client, input }) => {
     const { conversation } = await client.getConversation({ id: conversationId });
     const chatwootConversationId = conversation.tags.chatwootId;
 
+    const api_access_token = ctx.configuration.userAccessToken;
+
     const assignmentEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/assignments`;
     const assignmentMessageBody = { team_id: teamId };
 
@@ -42,7 +46,7 @@ export const sendToTeam = async ({ ctx, client, input }) => {
     try {
         const assignmentResponse = await axios.post(assignmentEndpoint, assignmentMessageBody, {
             headers: {
-                'api_access_token': ctx.configuration.userAccessToken,
+                'api_access_token': api_access_token,
                 'Content-Type': 'application/json',
             },
             maxBodyLength: Infinity
@@ -50,7 +54,7 @@ export const sendToTeam = async ({ ctx, client, input }) => {
 
         const statusResponse = await axios.post(statusEndpoint, statusMessageBody, {
             headers: {
-                'api_access_token': ctx.configuration.botToken,
+                'api_access_token': api_access_token,
                 'Content-Type': 'application/json',
             },
             maxBodyLength: Infinity

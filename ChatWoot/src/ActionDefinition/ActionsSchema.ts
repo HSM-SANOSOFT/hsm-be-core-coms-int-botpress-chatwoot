@@ -3,7 +3,7 @@ import { z } from '@botpress/sdk';
 // Full schema for sendToAgent action
 export const sendToAgentSchema = {
     title: 'Send to Agent',
-    description: 'Directs the conversation to an agent',
+    description: 'Directs the conversation to an agent that is associated with the agentBot',
     input: {
         schema: z.object({
             conversationId: z.string(),
