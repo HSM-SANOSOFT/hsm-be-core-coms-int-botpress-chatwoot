@@ -7,14 +7,16 @@ import { handleIncomingRequest } from './handler';
 import { sendOutgoingMessage } from './msn/outgoing-messages';
 import axios from 'axios';
 import { platform } from 'process';
-import { sendToAgent, sendToTeam } from './ActionDefinition/Actions';
+import * as Actions from './ActionDefinition/Actions';
 
 export default new bp.Integration({
   register: async ({ }) => { },
   unregister: async ({ }) => { },
   actions: {
-    sendToAgent,
-    sendToTeam,
+    sendToAgent: Actions.sendToAgent,
+    sendToTeam: Actions.sendToTeam,
+    getCustomAttributes: Actions.getCustomAttributes,
+    updateCustomAttributes: Actions.updateCustomAttributes,
   },
   channels: {
     chatwoot: {

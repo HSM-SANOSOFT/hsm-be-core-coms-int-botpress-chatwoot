@@ -23,9 +23,9 @@ export const handleIncomingMessage = async (
 
     const conversationId = data?.conversation?.id;
     const userId = data?.sender?.id;
-    const userPhone = (!data?.sender?.phone_number || data?.sender?.phone_number.trim() === "") ? "" : data?.sender?.phone_number;
-    const userEmail = (!data?.sender?.email || data?.sender?.email.trim() === "") ? "" : data?.sender?.email;
-    const userName = (!data?.sender?.name || data?.sender?.name.trim() === "") ? "" : data?.sender?.name;
+    const phone = (!data?.sender?.phone_number || data?.sender?.phone_number.trim() === "") ? "" : data?.sender?.phone_number;
+    const email = (!data?.sender?.email || data?.sender?.email.trim() === "") ? "" : data?.sender?.email;
+    const name = (!data?.sender?.name || data?.sender?.name.trim() === "") ? "" : data?.sender?.name;
     const messageId = data?.id;
     const content = data?.content;
     const inboxId = data?.conversation?.inbox_id?.toString();
@@ -63,9 +63,9 @@ export const handleIncomingMessage = async (
         const { user } = await client.getOrCreateUser({
             tags: {
                 chatwootId: `${userId}`,
-                userName: `${userName}`,  // Add user's name
-                userEmail: `${userEmail}`,  // Add user's email
-                userPhone: `${userPhone}`,  // Add user's phone number
+                name: `${name}`,  // Add user's name
+                email: `${email}`,  // Add user's email
+                phone: `${phone}`,  // Add user's phone number
             },
         });
 
@@ -100,8 +100,8 @@ export const handleIncomingMessage = async (
         }
 
         await client.createMessage({
-            tags: { 
-                chatwootId: `${messageId}` 
+            tags: {
+                chatwootId: `${messageId}`
             },
             type: messageType,
             userId: user.id,

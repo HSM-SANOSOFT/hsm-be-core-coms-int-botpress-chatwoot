@@ -2,18 +2,21 @@
 
 import { IntegrationDefinition, z, messages } from '@botpress/sdk';
 import { integrationName } from './package.json';
-import { sendToAgentSchema, sendToTeamSchema } from './src/ActionDefinition/ActionsSchema'; // Import action schemas
+import * as ActionsSchema from './src/ActionDefinition/ActionsSchema'; // Import all schemas as ActionsSchema
+
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '5.0.1',
+  version: '5.0.2',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
   icon: 'icon.svg',
   actions: {
-    sendToAgent: sendToAgentSchema, // Using the entire schema for sendToAgent
-    sendToTeam: sendToTeamSchema, // Using the entire schema for sendToTeam
+    sendToAgent: ActionsSchema.sendToAgentSchema, // Using the entire schema for sendToAgent
+    sendToTeam: ActionsSchema.sendToTeamSchema, // Using the entire schema for sendToTeam
+    getCustomAttributes: ActionsSchema.getCustomAttributesSchema, // Using the entire schema for getCustomAttributes
+    updateCustomAttributes: ActionsSchema.updateCustomAttributesSchema, // Using the entire schema for updateCustomAttributes
   },
   configuration: {
     schema: z.object({
@@ -45,9 +48,9 @@ export default new IntegrationDefinition({
   user: {
     tags: {
       chatwootId: {}, // Tag users with chatwootId
-      userName: {}, // Include userName tag (consider changing to 'name' for simplicity)
-      userEmail: {}, // Include userEmail tag (consider changing to 'email')
-      userPhone: {}, // Include userPhone tag (consider changing to 'phone')
+      name: {}, // Include Name tag 
+      email: {}, // Include Email tag 
+      phone: {}, // Include Phone tag
     },
   },
 });
