@@ -8,8 +8,6 @@ import { platform } from 'os';
 
 export const sendOutgoingMessage = async (params) => {
     const { ctx, conversation, message, type, client } = params;
-    console.log("Debugging in sendOutgoingMessage - Message Object:", message);
-
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }
@@ -385,7 +383,7 @@ const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
             },
             maxBodyLength: Infinity,
         });
-        console.log("Message sent to Chatwoot successfully. Response:", response.data);
+        //console.log("Message sent to Chatwoot successfully. Response:", response.data);
     } catch (error) {
         console.error(`Error sending message to Chatwoot: ${error}`);
         throw new Error(`Error sending message to Chatwoot: ${error}`);

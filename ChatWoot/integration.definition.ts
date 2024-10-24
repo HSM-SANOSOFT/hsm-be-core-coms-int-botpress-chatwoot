@@ -2,34 +2,23 @@
 
 import { IntegrationDefinition, z, messages } from '@botpress/sdk'
 import { integrationName } from './package.json'
+import { sendToAgentSchema, sendToTeamSchema } from './src/ActionDefinition/ActionsSchema'; // Import action schemas
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '4.0.5',
+  version: '5.0.0',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
   icon: 'icon.svg',
   actions: {
-    sendToAgent: {
-      title: 'Send to Agent',
-      description: 'Directs the conversation to an agent',
-      input: {
-        schema: z.object({
-          conversationId: z.string()
-        }),
-      },
-      output: {
-        schema: z.object({
-          currentStatus: z.string().describe('Conversation Status'),
-        }),
-      },
-    }
+    sendToAgent: sendToAgentSchema, // Using the entire schema for sendToAgent
+    sendToTeam: sendToTeamSchema, // Using the entire schema for sendToTeam
   },
-  events: {},
   configuration: {
     schema: z.object({
       botToken: z.string().optional(),
+      userAccessToken: z.string().describe('The Chatwoot user access token to authenticate API requests'), // Add user access token
       baseUrl: z.string(),
       accountNumber: z.number(),
       inboxNumber: z.number(),
