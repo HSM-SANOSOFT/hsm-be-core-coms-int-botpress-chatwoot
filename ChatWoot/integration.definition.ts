@@ -20,7 +20,7 @@ export default new IntegrationDefinition({
   },
   configuration: {
     schema: z.object({
-      botToken: z.string().optional(),
+      botToken: z.string().optional().describe('The Chatwoot bot agent access token to authenticate API requests'),
       userAccessToken: z.string().describe('The Chatwoot user access token to authenticate API requests'), // Add user access token
       baseUrl: z.string(),
       accountNumber: z.number(),
