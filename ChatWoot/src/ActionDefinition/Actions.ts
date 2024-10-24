@@ -84,14 +84,14 @@ export const getCustomAttributes = async ({ ctx, client, input }) => {
             },
         });
 
-        // Extract custom attributes from response
+        // Check if the response has a 'payload' object and it includes 'custom_attributes'
         const contact = response.data.payload;
         if (!contact || !contact.custom_attributes) {
             throw new Error('No custom attributes found for this contact');
         }
 
-        // Return the entire custom_attributes object dynamically
-        return contact.custom_attributes;
+        // Return the attributes directly (without the customAttributes object wrapper)
+        return contact.custom_attributes;  // Flatten the response so it's returned directly
     } catch (error) {
         throw new RuntimeError(`Error fetching custom attributes! ${error.message}`);
     }
