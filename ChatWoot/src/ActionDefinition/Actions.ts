@@ -69,10 +69,8 @@ export const sendToTeam = async ({ ctx, client, input }) => {
     }
 };
 
-
-// Action to get custom attributes
 export const getCustomAttributes = async ({ ctx, client, input }) => {
-    const chatwootId = input.contactId;  // Chatwoot user ID (contactId is chatwootId)
+    const chatwootId = input.contactId;
 
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootId}`;
 
@@ -84,19 +82,18 @@ export const getCustomAttributes = async ({ ctx, client, input }) => {
             },
         });
 
-        // Check if the response has a 'payload' object and it includes 'custom_attributes'
         const contact = response.data.payload;
+
         if (!contact || !contact.custom_attributes) {
             throw new Error('No custom attributes found for this contact');
         }
 
-        // Return the attributes directly (without the customAttributes object wrapper)
-        return contact.custom_attributes;  // Flatten the response so it's returned directly
+        // Return the custom attributes wrapped in an object
+        return { attributes: contact.custom_attributes };
     } catch (error) {
         throw new RuntimeError(`Error fetching custom attributes! ${error.message}`);
     }
 };
-
 
 // Action to update custom attributes
 export const updateCustomAttributes = async ({ ctx, client, input }) => {

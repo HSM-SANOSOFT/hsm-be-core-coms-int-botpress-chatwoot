@@ -35,21 +35,20 @@ export const sendToTeamSchema = {
     },
 };
 
-// Schema for the action to get custom attributes
 export const getCustomAttributesSchema = {
     title: 'Get Custom Attributes',
     description: 'Retrieve custom attributes for a Chatwoot contact',
     input: {
         schema: z.object({
-            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'), // Referencing Chatwoot ID
+            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),
         }),
     },
     output: {
-        schema: z.record(z.string(), z.any()).describe('Dynamic custom attributes of the contact'), // Return dynamic custom attributes
+        schema: z.object({
+            attributes: z.record(z.any()).describe('Dynamic custom attributes of the contact'),  // Capture dynamic attributes inside an "attributes" object
+        }),
     },
 };
-
-
 
 // Schema for the action to update custom attributes
 export const updateCustomAttributesSchema = {
