@@ -155,6 +155,7 @@ const sendDropdownMessage = async (message: any, endpoint: string, ctx: any, pla
 const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaType: string, platform: string) => {
     try {
         let mediaUrl: string | undefined;
+        let filename = message.payload?.title || 'media';
 
         switch (mediaType) {
             case 'image': mediaUrl = message.payload?.imageUrl; break;
@@ -203,7 +204,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         }
 
         formData.append('attachments[]', response.data, {
-            filename: 'media',
+            filename: '{filename}',
             contentType: mimeType,
         });
 
