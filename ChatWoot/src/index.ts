@@ -17,6 +17,8 @@ export default new bp.Integration({
     sendToTeam: Actions.sendToTeam,
     getCustomAttributes: Actions.getCustomAttributes,
     updateCustomAttributes: Actions.updateCustomAttributes,
+    updateEmail: Actions.updateEmail,
+    updatePhone: Actions.updatePhone
   },
   channels: {
     chatwoot: {

@@ -3,11 +3,12 @@
 import { IntegrationDefinition, z, messages } from '@botpress/sdk';
 import { integrationName } from './package.json';
 import * as ActionsSchema from './src/ActionDefinition/ActionsSchema'; // Import all schemas as ActionsSchema
+import { updateEmail, updatePhone } from 'src/ActionDefinition/Actions';
 
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '5.0.2',
+  version: '5.1.0',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',
@@ -17,6 +18,8 @@ export default new IntegrationDefinition({
     sendToTeam: ActionsSchema.sendToTeamSchema, // Using the entire schema for sendToTeam
     getCustomAttributes: ActionsSchema.getCustomAttributesSchema, // Using the entire schema for getCustomAttributes
     updateCustomAttributes: ActionsSchema.updateCustomAttributesSchema, // Using the entire schema for updateCustomAttributes
+    updateEmail: ActionsSchema.updateEmailSchema, // Using the entire schema for updateEmail
+    updatePhone: ActionsSchema.updatePhoneSchema, // Using the entire schema for updatePhone
   },
   configuration: {
     schema: z.object({

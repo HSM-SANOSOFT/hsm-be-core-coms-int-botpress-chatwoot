@@ -66,3 +66,37 @@ export const updateCustomAttributesSchema = {
         }),
     },
 };
+
+// Schema for the action to update custom attributes
+export const updateEmailSchema = {
+    title: 'Update Email',
+    description: 'Update email for a Chatwoot contact',
+    input: {
+        schema: z.object({
+            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),  // Referencing Chatwoot ID
+            email: z.string().describe('Email to update'),
+        }),
+    },
+    output: {
+        schema: z.object({
+            message: z.string().describe('Success message after updating custom attributes'),  // Updated output schema
+        }),
+    },
+};
+
+// Schema for the action to update custom attributes
+export const updatePhoneSchema = {
+    title: 'Update Phone',
+    description: 'Update phone number for a Chatwoot contact',
+    input: {
+        schema: z.object({
+            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),  // Referencing Chatwoot ID
+            phone: z.string().describe('phone number to update'),
+        }),
+    },
+    output: {
+        schema: z.object({
+            message: z.string().describe('Success message after updating custom attributes'),  // Updated output schema
+        }),
+    },
+};

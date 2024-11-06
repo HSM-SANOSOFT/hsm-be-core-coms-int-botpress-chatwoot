@@ -141,3 +141,81 @@ export const updateCustomAttributes = async ({ ctx, client, input }) => {
         throw new RuntimeError(`Error updating custom attributes! ${error}`);
     }
 };
+
+
+// Action to update custom attributes
+export const updateEmail = async ({ ctx, client, input }) => {
+    const chatwootId = input.contactId;  // Chatwoot contact ID
+    const email = input.email;  // Email to update
+
+    // Ensure the email is a valid string
+    if (typeof email !== 'string' || email.trim() === '') {
+        throw new RuntimeError('Email must be a valid, non-empty string');
+    }
+
+    // Endpoint for updating custom attributes
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootId}`;
+
+    // Build the request body for Chatwoot API
+    const updateBody = { email: email };
+
+    try {
+        // Make the API request to update the contact's custom attributes
+        const response = await axios.put(endpoint, updateBody, {
+            headers: {
+                'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // Log the full response to inspect the data
+        console.log("Response from Chatwoot:", response.data);
+
+        // Return only a success message
+        return {
+            message: 'Custom attributes updated successfully',
+        };
+    } catch (error) {
+        console.error("Error response from Chatwoot:", error.response?.data || error.message);
+        throw new RuntimeError(`Error updating custom attributes! ${error}`);
+    }
+};
+
+
+// Action to update custom attributes
+export const updatePhone = async ({ ctx, client, input }) => {
+    const chatwootId = input.contactId;  // Chatwoot contact ID
+    const phone = input.phone;  // Phone to update
+
+    // Ensure the Phone is a valid string
+    if (typeof phone !== 'string' || phone.trim() === '') {
+        throw new RuntimeError('Phone must be a valid, non-empty string');
+    }
+
+    // Endpoint for updating custom attributes
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootId}`;
+
+    // Build the request body for Chatwoot API
+    const updateBody = { phone_number: phone };
+
+    try {
+        // Make the API request to update the contact's custom attributes
+        const response = await axios.put(endpoint, updateBody, {
+            headers: {
+                'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // Log the full response to inspect the data
+        console.log("Response from Chatwoot:", response.data);
+
+        // Return only a success message
+        return {
+            message: 'Custom attributes updated successfully',
+        };
+    } catch (error) {
+        console.error("Error response from Chatwoot:", error.response?.data || error.message);
+        throw new RuntimeError(`Error updating custom attributes! ${error}`);
+    }
+};
