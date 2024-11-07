@@ -204,7 +204,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         }
 
         formData.append('attachments[]', response.data, {
-            filename: '{filename}',
+            filename: filename,
             contentType: mimeType,
         });
 
