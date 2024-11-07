@@ -149,8 +149,8 @@ export const updateEmail = async ({ ctx, client, input }) => {
     const email = input.email;  // Email to update
 
     // Ensure the email is a valid string
-    if (typeof email !== 'string' || email.trim() === '') {
-        throw new RuntimeError('Email must be a valid, non-empty string');
+    if (typeof email !== 'string') {
+        throw new RuntimeError('Email must be a string');
     }
 
     // Endpoint for updating custom attributes
@@ -188,8 +188,8 @@ export const updatePhone = async ({ ctx, client, input }) => {
     const phone = input.phone;  // Phone to update
 
     // Ensure the Phone is a valid string
-    if (typeof phone !== 'string' || phone.trim() === '') {
-        throw new RuntimeError('Phone must be a valid, non-empty string');
+    if (typeof phone !== 'string') {
+        throw new RuntimeError('Phone must be a valid');
     }
 
     // Endpoint for updating custom attributes
