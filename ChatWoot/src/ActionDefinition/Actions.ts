@@ -153,14 +153,14 @@ export const updateEmail = async ({ ctx, client, input }) => {
         throw new RuntimeError('Email must be a string');
     }
 
-    // Endpoint for updating custom attributes
+    // Endpoint for updating the contact's email
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootId}`;
 
     // Build the request body for Chatwoot API
     const updateBody = { email: email };
 
     try {
-        // Make the API request to update the contact's custom attributes
+        // Make the API request to update the contact's email
         const response = await axios.put(endpoint, updateBody, {
             headers: {
                 'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
