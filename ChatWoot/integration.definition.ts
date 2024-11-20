@@ -8,7 +8,7 @@ import { updateEmail, updatePhone } from 'src/ActionDefinition/Actions';
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '5.1.0',
+  version: '5.1.1',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',

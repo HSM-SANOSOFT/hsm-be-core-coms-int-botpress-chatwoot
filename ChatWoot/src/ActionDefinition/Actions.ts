@@ -173,11 +173,23 @@ export const updateEmail = async ({ ctx, client, input }) => {
 
         // Return only a success message
         return {
-            message: 'Custom attributes updated successfully',
+            message: 'Email updated successfully',
         };
     } catch (error) {
-        console.error("Error response from Chatwoot:", error.response?.data || error.message);
-        throw new RuntimeError(`Error updating custom attributes! ${error}`);
+        if (error.response?.status === 422) {
+            const errorMessage = error.response.data?.message || 'Unprocessable Entity';
+            const errorAttributes = error.response.data?.attributes || [];
+            console.warn(`Error response from Chatwoot: ${errorMessage}`, errorAttributes);
+            return {
+                message: `Error updating email: ${errorMessage}`,
+                attributes: errorAttributes,
+            };
+        } else {
+            console.error("Error response from Chatwoot:", error.response?.data || error.message);
+            return {
+                message: `Error updating email: ${error.response?.data || error.message}`,
+            };
+        }
     }
 };
 
