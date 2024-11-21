@@ -73,20 +73,24 @@ export const handleIncomingMessage = async (
         let payload: any;
         let messageType: string;
 
-        if (data?.attachments?.length && data.attachments[0]) {
+        if (content && content.trim() !== "") {
+            // Prioritize text content if present
+            messageType = 'text';
+            payload = { text: content };
+        } else if (data?.attachments?.length && data.attachments[0]) {
             const attachment = data.attachments[0];
 
             // Handling media types
-            if (attachment.content_type.startsWith('image')) {
+            if (attachment.content_type && attachment.content_type.startsWith('image')) {
                 messageType = 'image';
                 payload = { imageUrl: attachment.data_url };
-            } else if (attachment.content_type.startsWith('video')) {
+            } else if (attachment.content_type && attachment.content_type.startsWith('video')) {
                 messageType = 'video';
                 payload = { videoUrl: attachment.data_url };
-            } else if (attachment.content_type.startsWith('audio')) {
+            } else if (attachment.content_type && attachment.content_type.startsWith('audio')) {
                 messageType = 'audio';
                 payload = { audioUrl: attachment.data_url };
-            } else if (attachment.content_type.startsWith('application') || attachment.content_type.startsWith('file')) {
+            } else if (attachment.content_type && (attachment.content_type.startsWith('application') || attachment.content_type.startsWith('file'))) {
                 messageType = 'file';
                 payload = { fileUrl: attachment.data_url };
             } else {
