@@ -17,8 +17,6 @@ export const sendToAgent = async ({ ctx, client, input, data }) => {
         conversationId = tags.conversationId;
     }
 
-    const api_access_token = ctx.configuration.botToken;
-
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversationId}/toggle_status`;
 
     console.log('sendToAgent Endpoint:', endpoint);
@@ -26,7 +24,7 @@ export const sendToAgent = async ({ ctx, client, input, data }) => {
         console.log('Sending request to:', endpoint);
         const response = await axios.post(endpoint, { status: 'open' }, {
             headers: {
-                'api_access_token': api_access_token,
+                'api_access_token': ctx.configuration.botToken,
                 'Content-Type': 'application/json'
             },
             maxBodyLength: Infinity
@@ -108,7 +106,7 @@ export const getCustomAttributes = async ({ ctx, client, input, data }) => {
         console.log('Sending request to:', endpoint);
         const response = await axios.get(endpoint, {
             headers: {
-                'api_access_token': ctx.configuration.apiAccessToken,
+                'api_access_token': ctx.configuration.userAccessToken,
                 'Content-Type': 'application/json',
             },
             maxBodyLength: Infinity
