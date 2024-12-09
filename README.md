@@ -4,47 +4,53 @@
    pnpm setup && source /home/node/.bashrc && pnpm install -g @botpress/cli
    ```
 
+2. Install Botpress CLI:
+
+   ```sh
+   pnpm install -g @botpress/cli
+   ```
+
+3. Clone the Repo
+   ``` sh
+   git clone https://github.com/rsantamaria01/Chatwoot-Botpress-Integration.git
+   ```
+
 ### Navigate to Chatwoot Integration Folder
 2. Move to the Chatwoot integration directory:
    ```sh
-   cd <chatwoot-integration-folder>
+   cd Chatwoot-Botpress-Integration
    ```
 
 ### Install Dependencies
-3. Install required dependencies:
-   ```sh
-   pnpm install
-   ```
-
-4. Install the Botpress SDK:
+3. Install the Botpress SDK:
    ```sh
    pnpm add @botpress/sdk
    ```
 
-5. Build the integration:
+4. Build the integration:
    ```sh
    bp build
    ```
 
 ### Log into Botpress
-6. Log in to Botpress:
+5. Log in to Botpress:
    ```sh
    bp login
    ```
 
 ### Build and Deploy Integration
-7. To build the integration:
+6. To build the integration:
    ```sh
    bp build
    ```
 
-8. To deploy the integration:
+7. To deploy the integration:
    ```sh
    bp deploy
    ```
 
 ### Botpress Cliente Help
-9. To access the Botpress client menu:
+8. To access the Botpress client menu:
    ```sh
    bp --help
    ```
