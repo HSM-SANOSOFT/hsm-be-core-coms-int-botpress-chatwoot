@@ -7,14 +7,14 @@ const getTags = async (client, userId, conversationId) => {
     const { conversation } = await client.getConversation({ id: conversationId });
     const chatwootConversationId = conversation.tags.chatwootId;
 
-    const {user} = await client.getUser({ id: userId });
+    const { user } = await client.getUser({ id: userId });
     const chatwootContactId = user.tags.chatwootId;
 
     return { tags: { chatwootConversationId: chatwootConversationId, chatwootContactId: chatwootContactId } };
 };
 
 // SendToAgent: Keeps the existing functionality (toggle status to 'open')
-export const sendToAgent = async ({ ctx, client, input}) => {
+export const sendToAgent = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
@@ -46,7 +46,7 @@ export const sendToAgent = async ({ ctx, client, input}) => {
 };
 
 // New action: SendToTeam (assign to a specific team)
-export const sendToTeam = async ({ ctx, client, input}) => {
+export const sendToTeam = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
@@ -94,7 +94,7 @@ export const sendToTeam = async ({ ctx, client, input}) => {
     }
 };
 
-export const getCustomAttributes = async ({ ctx, client, input}) => {
+export const getCustomAttributes = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
@@ -118,7 +118,7 @@ export const getCustomAttributes = async ({ ctx, client, input}) => {
         });
         console.log('Response data:', response.data);
 
-        return { attributes: response.data.payload };
+        return { attributes: response.data.payload.custom_attributes};
     } catch (error) {
         console.error('Error:', error);
         throw new RuntimeError(`Error updating custom attributes! ${error}`);
@@ -126,7 +126,7 @@ export const getCustomAttributes = async ({ ctx, client, input}) => {
 };
 
 // Action to update custom attributes
-export const updateCustomAttributes = async ({ ctx, client, input}) => {
+export const updateCustomAttributes = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
@@ -178,7 +178,7 @@ export const updateCustomAttributes = async ({ ctx, client, input}) => {
 
 
 // Action to update custom attributes
-export const updateEmail = async ({ ctx, client, input}) => {
+export const updateEmail = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
@@ -232,7 +232,7 @@ export const updateEmail = async ({ ctx, client, input}) => {
 
 
 // Action to update custom attributes
-export const updatePhone = async ({ ctx, client, input}) => {
+export const updatePhone = async ({ ctx, client, input }) => {
     const userId = input.userId;
     const conversationId = input.conversationId;
 
