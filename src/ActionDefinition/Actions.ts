@@ -23,10 +23,9 @@ export const sendToAgent = async ({ ctx, client, input }) => {
     const chatwootContactId = tags.chatwootContactId;
 
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/toggle_status`;
-
     console.log('sendToAgent Endpoint:', endpoint);
+
     try {
-        console.log('Sending request to:', endpoint);
         const response = await axios.post(endpoint, { status: 'open' }, {
             headers: {
                 'api_access_token': ctx.configuration.botToken,
@@ -35,7 +34,6 @@ export const sendToAgent = async ({ ctx, client, input }) => {
             maxBodyLength: Infinity
         });
         console.log('Response data:', response.data);
-
         console.log(`Conversation assigned to agent #${conversationId}`);
 
         return { currentStatus: 'open' };
@@ -59,15 +57,13 @@ export const sendToTeam = async ({ ctx, client, input }) => {
     const assignmentEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/assignments`;
     const assignmentMessageBody = { team_id: input.teamId };
 
-    console.log('sendToTeam assignmentEndpoint:', assignmentEndpoint);
-
     const statusEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversationId}/toggle_status`;
     const statusMessageBody = { status: 'open' }
 
-    console.log('sendToTeam statusEndpoint:', statusEndpoint);
+    
 
     try {
-        console.log('Sending request to:', assignmentEndpoint);
+        console.log('sendToTeam assignmentEndpoint:', assignmentEndpoint);
         const assignmentResponse = await axios.post(assignmentEndpoint, assignmentMessageBody, {
             headers: {
                 'api_access_token': api_access_token,
@@ -77,7 +73,7 @@ export const sendToTeam = async ({ ctx, client, input }) => {
         });
         console.log('assignmentResponse data:', assignmentResponse.data);
 
-        console.log('Sending request to:', statusEndpoint);
+        console.log('sendToTeam statusEndpoint:', statusEndpoint);
         const statusResponse = await axios.post(statusEndpoint, statusMessageBody, {
             headers: {
                 'api_access_token': api_access_token,
@@ -104,11 +100,9 @@ export const getCustomAttributes = async ({ ctx, client, input }) => {
 
 
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
-
     console.log('getCustomAttributes Endpoint:', endpoint);
 
     try {
-        console.log('Sending request to:', endpoint);
         const response = await axios.get(endpoint, {
             headers: {
                 'api_access_token': ctx.configuration.userAccessToken,
@@ -152,12 +146,12 @@ export const updateCustomAttributes = async ({ ctx, client, input }) => {
 
     // Endpoint for updating custom attributes
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
+    console.log('updateCustomAttributes Endpoint:', endpoint);
 
     // Build the request body for Chatwoot API
     const updateBody = { custom_attributes: customAttributes };
 
     try {
-        console.log('Sending request to:', endpoint);
         const response = await axios.put(endpoint, updateBody, {
             headers: {
                 'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
@@ -195,12 +189,12 @@ export const updateEmail = async ({ ctx, client, input }) => {
 
     // Endpoint for updating the contact's email
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
+    console.log('updateEmail Endpoint:', endpoint);
 
     // Build the request body for Chatwoot API
     const updateBody = { email: email };
 
     try {
-        console.log('Sending request to:', endpoint);
         const response = await axios.put(endpoint, updateBody, {
             headers: {
                 'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
@@ -249,12 +243,12 @@ export const updatePhone = async ({ ctx, client, input }) => {
 
     // Endpoint for updating custom attributes
     const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
+    console.log('updatePhone Endpoint:', endpoint);
 
     // Build the request body for Chatwoot API
     const updateBody = { phone_number: phone };
 
     try {
-        console.log('Sending request to:', endpoint);
         const response = await axios.put(endpoint, updateBody, {
             headers: {
                 'api_access_token': ctx.configuration.userAccessToken,  // User access token for Chatwoot API
