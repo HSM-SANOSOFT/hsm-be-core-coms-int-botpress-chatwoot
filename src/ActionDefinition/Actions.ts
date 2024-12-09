@@ -1,23 +1,28 @@
 import axios from 'axios';
 import { RuntimeError } from '@botpress/sdk';
 
+
 // Helper function to get conversation and user tags from the incoming message
-const getTags = async (client, data) => {
-    const conversationId = data?.conversation?.id;
-    const contactId = data?.sender?.id;
-    return {tags : {conversationId: conversationId, contactId: contactId}};
+const getTags = async (client, userId, conversationId) => {
+    const { conversation } = await client.getConversation({ id: conversationId });
+    const chatwootConversationId = conversation.tags.chatwootId;
+
+    const {user} = await client.getUser({ id: userId });
+    const chatwootContactId = user.tags.chatwootId;
+
+    return { tags: { chatwootConversationId: chatwootConversationId, chatwootContactId: chatwootContactId } };
 };
 
 // SendToAgent: Keeps the existing functionality (toggle status to 'open')
-export const sendToAgent = async ({ ctx, client, input, data }) => {
-    let conversationId = input.conversationId;
+export const sendToAgent = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    if (!conversationId || conversationId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        conversationId = tags.conversationId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
-    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversationId}/toggle_status`;
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/toggle_status`;
 
     console.log('sendToAgent Endpoint:', endpoint);
     try {
@@ -41,17 +46,17 @@ export const sendToAgent = async ({ ctx, client, input, data }) => {
 };
 
 // New action: SendToTeam (assign to a specific team)
-export const sendToTeam = async ({ ctx, client, input, data }) => {
-    let conversationId = input.conversationId;
+export const sendToTeam = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    if (!conversationId || conversationId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        conversationId = tags.conversationId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
     const api_access_token = ctx.configuration.userAccessToken;
 
-    const assignmentEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversationId}/assignments`;
+    const assignmentEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/assignments`;
     const assignmentMessageBody = { team_id: input.teamId };
 
     console.log('sendToTeam assignmentEndpoint:', assignmentEndpoint);
@@ -89,16 +94,16 @@ export const sendToTeam = async ({ ctx, client, input, data }) => {
     }
 };
 
-export const getCustomAttributes = async ({ ctx, client, input, data }) => {
-    let contactId = input.contactId;
+export const getCustomAttributes = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    // If contactId is empty, use the userId set when the conversation started
-    if (!contactId || contactId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        contactId = tags.contactId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
-    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${contactId}`;
+
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
 
     console.log('getCustomAttributes Endpoint:', endpoint);
 
@@ -113,9 +118,7 @@ export const getCustomAttributes = async ({ ctx, client, input, data }) => {
         });
         console.log('Response data:', response.data);
 
-        return {
-            message: 'Custom attributes obtained successfully',
-        };
+        return { attributes: response.data.payload };
     } catch (error) {
         console.error('Error:', error);
         throw new RuntimeError(`Error updating custom attributes! ${error}`);
@@ -123,14 +126,13 @@ export const getCustomAttributes = async ({ ctx, client, input, data }) => {
 };
 
 // Action to update custom attributes
-export const updateCustomAttributes = async ({ ctx, client, input, data }) => {
-    let contactId = input.contactId;
+export const updateCustomAttributes = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    // If contactId is empty, use the userId set when the conversation started
-    if (!contactId || contactId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        contactId = tags.contactId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
     const inputCustomAttributes = input.customAttributes || '{}';  // Use '{}' as default to prevent parsing errors
 
@@ -149,7 +151,7 @@ export const updateCustomAttributes = async ({ ctx, client, input, data }) => {
     }
 
     // Endpoint for updating custom attributes
-    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${contactId}`;
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
 
     // Build the request body for Chatwoot API
     const updateBody = { custom_attributes: customAttributes };
@@ -176,14 +178,13 @@ export const updateCustomAttributes = async ({ ctx, client, input, data }) => {
 
 
 // Action to update custom attributes
-export const updateEmail = async ({ ctx, client, input, data }) => {
-    let contactId = input.contactId;
+export const updateEmail = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    // If contactId is empty, use the userId set when the conversation started
-    if (!contactId || contactId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        contactId = tags.contactId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
     const email = input.email;  // Email to update
 
@@ -193,7 +194,7 @@ export const updateEmail = async ({ ctx, client, input, data }) => {
     }
 
     // Endpoint for updating the contact's email
-    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${contactId}`;
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
 
     // Build the request body for Chatwoot API
     const updateBody = { email: email };
@@ -231,14 +232,13 @@ export const updateEmail = async ({ ctx, client, input, data }) => {
 
 
 // Action to update custom attributes
-export const updatePhone = async ({ ctx, client, input, data }) => {
-    let contactId = input.contactId;
+export const updatePhone = async ({ ctx, client, input}) => {
+    const userId = input.userId;
+    const conversationId = input.conversationId;
 
-    // If contactId is empty, use the userId set when the conversation started
-    if (!contactId || contactId.trim() === '') {
-        const { tags } = await getTags(client, data);
-        contactId = tags.contactId;
-    }
+    const { tags } = await getTags(client, userId, conversationId);
+    const chatwootConversationId = tags.chatwootConversationId;
+    const chatwootContactId = tags.chatwootContactId;
 
     const phone = input.phone;  // Phone to update
 
@@ -248,7 +248,7 @@ export const updatePhone = async ({ ctx, client, input, data }) => {
     }
 
     // Endpoint for updating custom attributes
-    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${contactId}`;
+    const endpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/contacts/${chatwootContactId}`;
 
     // Build the request body for Chatwoot API
     const updateBody = { phone_number: phone };

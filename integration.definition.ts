@@ -3,12 +3,11 @@
 import { IntegrationDefinition, z, messages } from '@botpress/sdk';
 import { integrationName } from './package.json';
 import * as ActionsSchema from './src/ActionDefinition/ActionsSchema'; // Import all schemas as ActionsSchema
-import { updateEmail, updatePhone } from 'src/ActionDefinition/Actions';
 
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '5.1.2',
+  version: '5.1.3',
   readme: 'hub.md',
   title: 'Chatwoot',
   description: 'Chatwoot Integration for live agent handoff',

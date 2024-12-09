@@ -1,6 +1,6 @@
 // File: ChatWoot/src/ActionDefinition/ActionsSchema.ts
 
-import { string, z } from '@botpress/sdk';
+import { conversation, string, z } from '@botpress/sdk';
 
 // Full schema for sendToAgent action
 export const sendToAgentSchema = {
@@ -8,7 +8,8 @@ export const sendToAgentSchema = {
     description: 'Directs the conversation to an agent that is associated with the agentBot',
     input: {
         schema: z.object({
-            conversationId: z.string(),
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
         }),
     },
     output: {
@@ -24,7 +25,8 @@ export const sendToTeamSchema = {
     description: 'Assigns the conversation to a specific team based on the provided Team ID',
     input: {
         schema: z.object({
-            conversationId: z.string(),
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
             teamId: z.number().describe('ID of the team to assign (must be a number)'), // Team ID as a number
         }),
     },
@@ -40,7 +42,8 @@ export const getCustomAttributesSchema = {
     description: 'Retrieve custom attributes for a Chatwoot contact',
     input: {
         schema: z.object({
-            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
         }),
     },
     output: {
@@ -56,7 +59,8 @@ export const updateCustomAttributesSchema = {
     description: 'Update custom attributes for a Chatwoot contact',
     input: {
         schema: z.object({
-            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),  // Referencing Chatwoot ID
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
             customAttributes: z.string().describe('Body of the request (JSON). Include here the payload to send in the request.'),
         }),
     },
@@ -73,7 +77,8 @@ export const updateEmailSchema = {
     description: 'Update email for a Chatwoot contact',
     input: {
         schema: z.object({
-            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),  // Referencing Chatwoot ID
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
             email: z.string().describe('Email to update'),
         }),
     },
@@ -90,7 +95,8 @@ export const updatePhoneSchema = {
     description: 'Update phone number for a Chatwoot contact',
     input: {
         schema: z.object({
-            contactId: z.string().describe('The Chatwoot contact ID (chatwootId)'),  // Referencing Chatwoot ID
+            userId: z.string().describe('The Botpress Event user ID'),
+            conversationId: z.string().describe('The Botpress Event conversation ID'),
             phone: z.string().describe('phone number to update'),
         }),
     },
