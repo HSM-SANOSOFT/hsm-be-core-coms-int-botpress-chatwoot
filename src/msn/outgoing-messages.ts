@@ -372,7 +372,7 @@ const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
     try {
         await axios.post(endpoint, messageBody, {
             headers: {
-                'api_access_token': ctx.configuration.apiAccessToken,
+                'api_access_token': ctx.configuration.botToken,
                 'Content-Type': 'application/json',
             },
             maxBodyLength: Infinity
