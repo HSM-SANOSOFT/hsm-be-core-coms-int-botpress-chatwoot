@@ -31,13 +31,6 @@ export const handleIncomingMessage = async (
     const inboxId = data?.conversation?.inbox_id?.toString();
     const platform = data?.conversation?.channel?.replace('Channel::', '').toLowerCase();
 
-    console.log('Conversation ID:', conversationId);
-    console.log('Platform:', platform);
-    console.log('Inbox ID:', inboxId);
-    console.log('Content:', content);
-    console.log('Message ID:', messageId);
-    console.log('User ID:', userId);
-
     if (!conversationId || !userId || !messageId) {
         return {
             status: 400,
@@ -51,7 +44,6 @@ export const handleIncomingMessage = async (
             tags: {
                 chatwootId: `${conversationId}`,
                 inboxId: `${inboxId}`,
-                platform: `${platform}`,
             },
         });
 
@@ -59,28 +51,32 @@ export const handleIncomingMessage = async (
             throw new RuntimeError('Conversation or its tags are not properly defined');
         }
 
-        // Create or update user with tags
+        // Log the values when the conversation is created
+        console.log('Conversation ID:', conversationId);
+        console.log('Platform:', platform);
+        console.log('Inbox ID:', inboxId);
+        console.log('Content:', content);
+        console.log('Message ID:', messageId);
+        console.log('User ID:', userId);
+
         const { user } = await client.getOrCreateUser({
             tags: {
                 chatwootId: `${userId}`,
-                name: `${name}`,  // Add user's name
-                email: `${email}`,  // Add user's email
-                phone: `${phone}`,  // Add user's phone number
+                name: `${name}`,
+                email: `${email}`,
+                phone: `${phone}`,
             },
         });
 
-        // Determine the message type and handle accordingly
         let payload: any;
         let messageType: string;
 
         if (content && content.trim() !== "") {
-            // Prioritize text content if present
             messageType = 'text';
             payload = { text: content };
         } else if (data?.attachments?.length && data.attachments[0]) {
             const attachment = data.attachments[0];
 
-            // Handling media types
             if (attachment.content_type && attachment.content_type.startsWith('image')) {
                 messageType = 'image';
                 payload = { imageUrl: attachment.data_url };
@@ -95,10 +91,9 @@ export const handleIncomingMessage = async (
                 payload = { fileUrl: attachment.data_url };
             } else {
                 messageType = 'text';
-                payload = { text: content }; // Defaulting to text if unknown attachment type
+                payload = { text: content };
             }
         } else {
-            // Handling text messages
             messageType = 'text';
             payload = { text: content };
         }
@@ -109,19 +104,13 @@ export const handleIncomingMessage = async (
             },
             type: messageType,
             userId: user.id,
-            conversationId: conversation.id,
-            payload: payload,
         });
 
         return {
             status: 200,
-            body: 'Message received',
+            body: 'Message processed successfully',
         };
     } catch (error) {
-        console.error('Error handling conversation or user creation:', error);
-        return {
-            status: 500,
-            body: 'Internal server error',
-        };
+        throw new RuntimeError(`Error processing incoming message: ${error}`);
     }
 };

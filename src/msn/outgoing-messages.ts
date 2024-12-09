@@ -169,8 +169,6 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
             throw new Error(`Media URL is missing for type: ${mediaType}`);
         }
 
-        console.log(`Processing ${mediaType} from URL:`, mediaUrl);
-
         // Platform-specific logic for file type and FacebookPage
         if (platform === 'facebookpage' && mediaType === 'file') {
             // Shorten the media URL using TinyURL API
@@ -185,14 +183,12 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
 
             // Send the message body as a link to Chatwoot
             await sendToChatwoot(messageBody, endpoint, ctx);
-            console.log(`File sent as link for FacebookPage: ${shortenedUrl}`);
             return;
         }
 
         // Fetch media for other types or platforms
         const response = await axios.get(mediaUrl, { responseType: 'stream' });
         const mimeType = response.headers['content-type'] || guessContentTypeFromUrl(mediaUrl); // Fallback to helper function
-        console.log(`${mediaType} fetched successfully from URL:`, mediaUrl);
 
 
         const formData = new FormData();
@@ -217,9 +213,7 @@ const sendMediaMessage = async (message: any, endpoint: string, ctx: any, mediaT
         };
 
         const mediaResponse = await axios.post(endpoint, formData, config);
-        console.log(`${mediaType} message sent successfully. Response:`, mediaResponse.data);
     } catch (error) {
-        console.error(`Error sending ${mediaType} message: ${error.message}`);
         throw new Error(`Error sending ${mediaType} message: ${error}`);
     }
 };
@@ -230,7 +224,6 @@ const shortenUrl = async (url: string): Promise<string> => {
         const responseURL = await axios.get(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`);
         return responseURL.data;
     } catch (error) {
-        console.error(`Error shortening URL: ${error.message}`);
         return url; // If the URL shortening fails, return the original URL
     }
 };
@@ -377,16 +370,14 @@ const sendLocationMessage = async (message: any, endpoint: string, ctx: any) => 
 // Helper function to send message to Chatwoot
 const sendToChatwoot = async (messageBody: any, endpoint: string, ctx: any) => {
     try {
-        const response = await axios.post(endpoint, messageBody, {
+        await axios.post(endpoint, messageBody, {
             headers: {
-                'api_access_token': ctx.configuration.botToken,
+                'api_access_token': ctx.configuration.apiAccessToken,
                 'Content-Type': 'application/json',
             },
-            maxBodyLength: Infinity,
+            maxBodyLength: Infinity
         });
-        //console.log("Message sent to Chatwoot successfully. Response:", response.data);
     } catch (error) {
-        console.error(`Error sending message to Chatwoot: ${error}`);
         throw new Error(`Error sending message to Chatwoot: ${error}`);
     }
 };
