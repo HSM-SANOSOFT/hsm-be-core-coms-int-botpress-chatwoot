@@ -1,9 +1,50 @@
-# ChatWoot Botpress Integration
+### Inside the devcontainer
+1. Run the setup and install global dependencies:
+   ```sh
+   pnpm setup && source /home/node/.bashrc && pnpm install -g @botpress/cli
+   ```
 
-This is a community-made Integration. It was developed by Michael Barney & ProAI. If you need any help configuring the integration, feel free to contact me at: contato@michaelbarney.com
+### Navigate to Chatwoot Integration Folder
+2. Move to the Chatwoot integration directory:
+   ```sh
+   cd <chatwoot-integration-folder>
+   ```
 
-Open-Source Repo:
-https://github.com/MichaelBarney/Chatwoot-Botpress-Integration
+### Install Dependencies
+3. Install required dependencies:
+   ```sh
+   pnpm install
+   ```
 
-### Changelog
-v1.0.2 - Fixed issue with "Send to Agent" action.
+4. Install the Botpress SDK:
+   ```sh
+   pnpm add @botpress/sdk
+   ```
+
+5. Build the integration:
+   ```sh
+   bp build
+   ```
+
+### Log into Botpress
+6. Log in to Botpress:
+   ```sh
+   bp login
+   ```
+
+### Build and Deploy Integration
+7. To build the integration:
+   ```sh
+   bp build
+   ```
+
+8. To deploy the integration:
+   ```sh
+   bp deploy
+   ```
+
+### Botpress Cliente Help
+9. To access the Botpress client menu:
+   ```sh
+   bp --help
+   ```
