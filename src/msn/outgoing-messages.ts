@@ -1,13 +1,11 @@
 //File: ChatWoot/src/msn/outgoing-messages.ts
 
 import axios from 'axios';
-import { IntegrationContext } from '@botpress/sdk';
 import { Message } from './message-type';
 import FormData from 'form-data';
-import { platform } from 'os';
 
 export const sendOutgoingMessage = async (params) => {
-    const { ctx, conversation, message, type, client } = params;
+    const { ctx, conversation, message, type } = params;
     if (!conversation) {
         throw new Error("Conversation object is undefined or null in sendOutgoingMessage.");
     }

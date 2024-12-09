@@ -50,6 +50,7 @@ export interface FilePayload {
     type: 'file';
     url: string;
     caption?: string;
+    title?: string;
 }
 
 // Carousel and Cards Payload Adjustments
@@ -85,7 +86,7 @@ export interface MarkdownPayload {
     text: string;
 }
 
-export interface BlockPayload {
+export interface BlocPayload {
     type: 'bloc';
     text: string;
     attachments?: any[];
@@ -111,4 +112,4 @@ export type Message =
     | CardsPayload  // Updated from 'CardPayload' to 'CardsPayload'
     | LocationPayload
     | MarkdownPayload
-    | BlockPayload;
+    | BlocPayload;
