@@ -44,6 +44,7 @@ export const handleIncomingMessage = async (
             tags: {
                 chatwootId: `${conversationId}`,
                 inboxId: `${inboxId}`,
+                platform: `${platform}`
             },
         });
 
@@ -104,6 +105,8 @@ export const handleIncomingMessage = async (
             },
             type: messageType,
             userId: user.id,
+            conversationId: conversation.id,
+            payload: payload,
         });
 
         return {
