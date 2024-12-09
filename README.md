@@ -1,4 +1,4 @@
-### Inside the devcontainer
+# Setup devcontainer
 1. Run the setup and install global dependencies:
    ```sh
    pnpm setup && source /home/node/.bashrc && pnpm install -g @botpress/cli
@@ -15,42 +15,37 @@
    git clone https://github.com/rsantamaria01/Chatwoot-Botpress-Integration.git
    ```
 
-### Navigate to Chatwoot Integration Folder
-2. Move to the Chatwoot integration directory:
+# Setup Integration Folder
+1. Move to the Chatwoot integration directory:
    ```sh
    cd Chatwoot-Botpress-Integration
    ```
 
-### Install Dependencies
-3. Install the Botpress SDK:
+   ### Install Dependencies
+2. Install the Botpress SDK:
    ```sh
    pnpm add @botpress/sdk
    ```
 
-4. Build the integration:
-   ```sh
-   bp build
-   ```
-
-### Log into Botpress
-5. Log in to Botpress:
+# Setup Botpress Client
+1. Log in to Botpress:
    ```sh
    bp login
    ```
 
-### Build and Deploy Integration
-6. To build the integration:
+# Build and Deploy Integration
+1. To build the integration:
    ```sh
    bp build
    ```
 
-7. To deploy the integration:
+2. To deploy the integration:
    ```sh
    bp deploy
    ```
 
-### Botpress Cliente Help
-8. To access the Botpress client menu:
+# Botpress Cliente Help
+1. To access the Botpress client menu:
    ```sh
    bp --help
    ```
