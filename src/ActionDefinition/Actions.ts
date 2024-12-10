@@ -38,7 +38,7 @@ export const sendToAgent = async ({ ctx, client, input }) => {
 
         return { currentStatus: 'open' };
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error.response.data);
         throw new RuntimeError(`Error sending to agent! ${error}`);
     }
 };
@@ -85,7 +85,7 @@ export const sendToTeam = async ({ ctx, client, input }) => {
 
         return { currentStatus: 'open' };
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error.response.data);
         throw new RuntimeError(`Error assigning to team! ${error}`);
     }
 };
