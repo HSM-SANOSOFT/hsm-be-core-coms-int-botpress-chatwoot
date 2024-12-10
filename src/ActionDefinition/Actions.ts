@@ -57,7 +57,7 @@ export const sendToTeam = async ({ ctx, client, input }) => {
     const assignmentEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/assignments`;
     const assignmentMessageBody = { team_id: input.teamId };
 
-    const statusEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${conversationId}/toggle_status`;
+    const statusEndpoint = `${ctx.configuration.baseUrl}/api/v1/accounts/${ctx.configuration.accountNumber}/conversations/${chatwootConversationId}/toggle_status`;
     const statusMessageBody = { status: 'open' }
 
     
