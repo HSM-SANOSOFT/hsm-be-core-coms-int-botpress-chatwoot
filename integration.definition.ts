@@ -141,7 +141,16 @@ export default new IntegrationDefinition({
 
   channels: {
     chatwoot: {
-      messages: messages.defaults,
+      messages: {
+        text: messages.defaults.text,
+        choice: messages.defaults.choice,
+        dropdown: messages.defaults.dropdown,
+        card: messages.defaults.card,
+        image: messages.defaults.image,
+        audio: messages.defaults.audio,
+        video: messages.defaults.video,
+        file: messages.defaults.file,
+      },
       message: {
         tags: {
           id: {

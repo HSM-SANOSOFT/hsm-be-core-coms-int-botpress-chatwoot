@@ -114,10 +114,7 @@ export class ChatwootClient {
       | 'image'
       | 'video'
       | 'audio'
-      | 'file'
-      | 'carousel'
-      | 'location'
-      | 'bloc',
+      | 'file',
     content_attributes?: unknown,
     template_params?: Record<string, unknown>,
   ) {
@@ -202,9 +199,9 @@ export class ChatwootClient {
       availability_status: string;
       payload: {
         contact: {
-          email: string;
+          email: string | null;
           name: string;
-          phone_number: string;
+          phone_number: string | null;
           thumbnail: string;
           additional_attributes: Record<string, unknown>;
           custom_attributes: Record<string, unknown>;
@@ -239,9 +236,9 @@ export class ChatwootClient {
     } = data.payload.contact;
 
     const response = {
-      email,
+      email: email ?? '',
       name,
-      phone_number,
+      phone_number: phone_number ?? '',
       additional_attributes,
       custom_attributes,
     };

@@ -456,146 +456,6 @@ export default new Integration({
 
           await ack({ tags: { id: id.toString() } });
         },
-        carousel: async params => {
-          const { ctx, client, ack, type, payload, conversation, logger } =
-            params;
-          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
-          const conversation_id = conversation.tags.id as string;
-          const content = payload.items.map(item => item.title).join('\n');
-          const content_attributes = {
-            items: payload.items.map(item => {
-              const card: {
-                media_url: string;
-                title: string;
-                description: string;
-                actions?: Array<{
-                  type: string;
-                  text: string;
-                  uri?: string;
-                  payload?: string;
-                }>;
-              } = {
-                media_url: item.imageUrl as string,
-                title: item.title,
-                description: item.subtitle as string,
-              };
-
-              if (item.actions?.length) {
-                card.actions = item.actions.map(({ action, label, value }) => {
-                  return action === 'url'
-                    ? { type: 'link', text: label, uri: value }
-                    : { type: 'postback', text: label, payload: value };
-                });
-              }
-
-              return card;
-            }),
-          };
-
-          const {
-            state: {
-              payload: { agentBotApiKey },
-            },
-          } = await client.getState({
-            id: ctx.integrationId,
-            type: 'integration',
-            name: 'configuration',
-          });
-
-          const chatwootClient = new ChatwootClient(
-            logger,
-            agentBotApiKey,
-            ctx.configuration.accountId,
-            ctx.configuration.baseUrl,
-          );
-
-          const { id } = await chatwootClient.createNewMessage(
-            conversation_id,
-            content,
-            'outgoing',
-            false,
-            type,
-            content_attributes,
-          );
-
-          await ack({ tags: { id: id.toString() } });
-        },
-        bloc: async params => {
-          const { ctx, client, ack, type, payload, conversation, logger } =
-            params;
-          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
-          const conversation_id = conversation.tags.id as string;
-          const content = 'bloc';
-          const content_attributes = payload;
-
-          const {
-            state: {
-              payload: { agentBotApiKey },
-            },
-          } = await client.getState({
-            id: ctx.integrationId,
-            type: 'integration',
-            name: 'configuration',
-          });
-
-          const chatwootClient = new ChatwootClient(
-            logger,
-            agentBotApiKey,
-            ctx.configuration.accountId,
-            ctx.configuration.baseUrl,
-          );
-
-          const { id } = await chatwootClient.createNewMessage(
-            conversation_id,
-            content,
-            'outgoing',
-            false,
-            type,
-            content_attributes,
-          );
-
-          await ack({ tags: { id: id.toString() } });
-        },
-        location: async params => {
-          const { ctx, client, ack, type, payload, conversation, logger } =
-            params;
-          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
-          const conversation_id = conversation.tags.id as string;
-          const content = payload.title as string;
-          const content_attributes = {
-            latitude: payload.latitude,
-            longitude: payload.longitude,
-            address: payload.address,
-          };
-
-          const {
-            state: {
-              payload: { agentBotApiKey },
-            },
-          } = await client.getState({
-            id: ctx.integrationId,
-            type: 'integration',
-            name: 'configuration',
-          });
-
-          const chatwootClient = new ChatwootClient(
-            logger,
-            agentBotApiKey,
-            ctx.configuration.accountId,
-            ctx.configuration.baseUrl,
-          );
-
-          const { id } = await chatwootClient.createNewMessage(
-            conversation_id,
-            content,
-            'outgoing',
-            false,
-            type,
-            content_attributes,
-          );
-
-          await ack({ tags: { id: id.toString() } });
-        },
       },
     },
   },
@@ -742,7 +602,7 @@ export default new Integration({
       data?.conversation?.channel?.replace('Channel::', '') || '';
     const inboxId = data?.conversation?.inbox_id.toString();
     const content_type = data?.content_type;
-    const mappedtype: Record<string, keyof typeof messages.defaults> = {
+    const mappedtype = {
       text: 'text',
       choice: 'choice',
       dropdown: 'dropdown',
@@ -750,13 +610,12 @@ export default new Integration({
       video: 'video',
       audio: 'audio',
       file: 'file',
-      bloc: 'bloc',
-      carousel: 'carousel',
-      card: 'card',
-      location: 'location',
-    } as const;
+    } as const satisfies Partial<
+      Record<string, keyof typeof messages.defaults>
+    >;
 
-    const type = mappedtype[content_type] ?? 'text';
+    const type: (typeof mappedtype)[keyof typeof mappedtype] | undefined =
+      mappedtype[content_type as keyof typeof mappedtype];
     const content = data?.content;
 
     logger.forBot().debug(
@@ -771,79 +630,6 @@ export default new Integration({
           content,
         }),
     );
-
-    /*
-    let payload;
-
-    switch (type) {
-      case 'text':
-        payload = { text: content ?? '' };
-        break;
-
-      case 'image':
-        payload = { image: { url: content } };
-        break;
-      case 'video':
-        payload = { video: { url: content } };
-        break;
-      case 'audio':
-        payload = { audio: { url: content } };
-        break;
-      case 'file':
-        payload = { file: { url: content } };
-        break;
-
-      case 'bloc':
-        payload = { bloc: { id: content } };
-        break;
-
-      case 'location':
-        payload = {
-          location: {
-            latitude: 0,
-            longitude: 0,
-          },
-        };
-        break;
-
-      case 'choice':
-        payload = {
-          choice: {
-            text: content,
-            choices: [],
-          },
-        };
-        break;
-      case 'dropdown':
-        payload = {
-          dropdown: {
-            text: content,
-            choices: [],
-          },
-        };
-        break;
-
-      case 'card':
-        payload = {
-          card: {
-            title: content ?? 'Default title',
-            actions: [],
-          },
-        };
-        break;
-
-      case 'carousel':
-        payload = {
-          carousel: {
-            items: [],
-          },
-        };
-        break;
-
-      default:
-        payload = { text: content };
-    }
-    */
 
     const { conversation } = await client.getOrCreateConversation({
       channel: 'chatwoot',
