@@ -5,6 +5,37 @@ import Mime from 'mime';
 
 import type { Logger } from '.botpress';
 
+type contact = {
+  payload: {
+    id: number;
+    availability_status: string;
+    email?: string | null;
+    name?: string | null;
+    phone_number?: string | null;
+    thumbnail: string;
+    additional_attributes: Record<string, unknown>;
+    custom_attributes: Record<string, unknown>;
+    contact_inboxes: Array<{
+      source_id: string;
+      inbox: {
+        id: number;
+        name: string;
+        website_url: string;
+        channel_type: string;
+        avatar_url: string;
+        widget_color: string;
+        website_token: string;
+        enable_auto_assignment: boolean;
+        web_widget_script: string;
+        welcome_title: string;
+        welcome_tagline: string;
+        greeting_enabled: boolean;
+        greeting_message: string;
+      };
+    }>;
+  };
+};
+
 export class ChatwootClient {
   private axios: AxiosInstance;
 
@@ -194,38 +225,7 @@ export class ChatwootClient {
   }
 
   async getContact(contact_Id: number) {
-    const { data } = await this.axios.get<{
-      id: number;
-      availability_status: string;
-      payload: {
-        contact: {
-          email: string | null;
-          name: string;
-          phone_number: string | null;
-          thumbnail: string;
-          additional_attributes: Record<string, unknown>;
-          custom_attributes: Record<string, unknown>;
-          contact_inboxes: Array<{
-            source_id: string;
-            inbox: {
-              id: number;
-              name: string;
-              website_url: string;
-              channel_type: string;
-              avatar_url: string;
-              widget_color: string;
-              website_token: string;
-              enable_auto_assignment: boolean;
-              web_widget_script: string;
-              welcome_title: string;
-              welcome_tagline: string;
-              greeting_enabled: boolean;
-              greeting_message: string;
-            };
-          }>;
-        };
-      };
-    }>(`/contacts/${contact_Id}`);
+    const { data } = await this.axios.get<contact>(`/contacts/${contact_Id}`);
 
     const {
       email,
@@ -233,7 +233,7 @@ export class ChatwootClient {
       phone_number,
       additional_attributes,
       custom_attributes,
-    } = data.payload.contact;
+    } = data.payload;
 
     const response = {
       email: email ?? '',
@@ -260,37 +260,9 @@ export class ChatwootClient {
       custom_attributes?: Record<string, unknown>;
     },
   ) {
-    const { data } = await this.axios.put<{
-      id: number;
-      payload: {
-        contact: {
-          email: string;
-          name: string;
-          phone_number: string;
-          thumbnail: string;
-          additional_attributes: Record<string, unknown>;
-          custom_attributes: Record<string, unknown>;
-          contact_inboxes: Array<{
-            source_id: string;
-            inbox: {
-              id: number;
-              name: string;
-              website_url: string;
-              channel_type: string;
-              avatar_url: string;
-              widget_color: string;
-              website_token: string;
-              enable_auto_assignment: boolean;
-              web_widget_script: string;
-              welcome_title: string;
-              welcome_tagline: string;
-              greeting_enabled: boolean;
-              greeting_message: string;
-            };
-          }>;
-        };
-      };
-    }>(`/contacts/${contact_Id}`, { ...updateData });
+    const { data } = await this.axios.put<contact>(`/contacts/${contact_Id}`, {
+      ...updateData,
+    });
 
     const {
       email,
@@ -298,7 +270,7 @@ export class ChatwootClient {
       phone_number,
       additional_attributes,
       custom_attributes,
-    } = data.payload.contact;
+    } = data.payload;
 
     const response = {
       email,

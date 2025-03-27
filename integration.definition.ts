@@ -59,11 +59,20 @@ export default new IntegrationDefinition({
       },
       output: {
         schema: z.object({
-          email: z.string().nullable().describe('Email of the contact'),
-          name: z.string().nullable().describe('Name of the contact'),
+          email: z
+            .string()
+            .nullable()
+            .optional()
+            .describe('Email of the contact'),
+          name: z
+            .string()
+            .nullable()
+            .optional()
+            .describe('Name of the contact'),
           phone_number: z
             .string()
             .nullable()
+            .optional()
             .describe('Phone number of the contact'),
           additional_attributes: z
             .record(z.any())
@@ -90,22 +99,36 @@ export default new IntegrationDefinition({
             .string()
             .optional()
             .describe('Phone number to update'),
-          avatar: z.string().optional().describe('Avatar URL to update'),
-          avatar_url: z.string().optional().describe('Avatar URL to update'),
-          identifier: z.string().optional().describe('Identifier to update'),
           custom_attributes: z
-            .record(z.any())
+            .object({})
+            .catchall(z.any())
             .optional()
             .describe('Custom attributes to update'),
         }),
       },
       output: {
         schema: z.object({
-          email: z.string().nullable(),
-          name: z.string().nullable(),
-          phone_number: z.string().nullable(),
-          additional_attributes: z.record(z.any()),
-          custom_attributes: z.record(z.any()),
+          email: z
+            .string()
+            .nullable()
+            .optional()
+            .describe('Email of the contact'),
+          name: z
+            .string()
+            .nullable()
+            .optional()
+            .describe('Name of the contact'),
+          phone_number: z
+            .string()
+            .nullable()
+            .optional()
+            .describe('Phone number of the contact'),
+          additional_attributes: z
+            .record(z.any())
+            .describe('Additional attributes of the contact'),
+          custom_attributes: z
+            .record(z.any())
+            .describe('Custom attributes of the contact'),
         }),
       },
     },
