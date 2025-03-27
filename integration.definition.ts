@@ -100,8 +100,7 @@ export default new IntegrationDefinition({
             .optional()
             .describe('Phone number to update'),
           custom_attributes: z
-            .object({})
-            .catchall(z.any())
+            .array(z.record(z.unknown()))
             .optional()
             .describe('Custom attributes to update'),
         }),

@@ -129,7 +129,6 @@ export default new Integration({
 
     updateContact: async params => {
       const { ctx, input, logger } = params;
-      const { contact_Id, ...updateData } = input;
 
       const chatwootClient = new ChatwootClient(
         logger,
@@ -137,6 +136,20 @@ export default new Integration({
         ctx.configuration.accountId,
         ctx.configuration.baseUrl,
       );
+
+      const { contact_Id, ...data } = input;
+
+      const { custom_attributes } = data;
+
+      const updateData: {
+        name?: string;
+        email?: string;
+        phone_number?: string;
+        custom_attributes?: Record<string, unknown>;
+      } = {
+        ...data,
+        custom_attributes: custom_attributes?.[0] as Record<string, unknown>,
+      };
 
       const response = await chatwootClient.updateContact(
         contact_Id,

@@ -13,8 +13,8 @@ type contact = {
     name?: string | null;
     phone_number?: string | null;
     thumbnail: string;
-    additional_attributes: Record<string, unknown>;
-    custom_attributes: Record<string, unknown>;
+    additional_attributes: Record<string, unknown> | object;
+    custom_attributes: Record<string, unknown> | object;
     contact_inboxes: Array<{
       source_id: string;
       inbox: {
