@@ -1,5 +1,7 @@
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
+import FormData from 'form-data';
+import Mime from 'mime';
 
 import type { Logger } from '.botpress';
 
@@ -10,26 +12,16 @@ export class ChatwootClient {
     private logger: Logger,
     private ApiKey: string,
     private accountId: number,
-    private baseURL: string,
-    private formData?: boolean,
+    private url: string,
   ) {
-    const url = `${this.baseURL}/api/v1/accounts/${this.accountId}`;
-    if (this.formData) {
-      this.axios = axios.create({
-        baseURL: url,
-        headers: {
-          api_access_token: this.ApiKey,
-          'Content-Type':
-            'multipart/form-data; boundary=----WebKitFormBoundary',
-        },
-      });
-    }
+    const baseURL = `${this.url}/api/v1/accounts/${this.accountId}`;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      api_access_token: this.ApiKey,
+    };
     this.axios = axios.create({
-      baseURL: url,
-      headers: {
-        api_access_token: this.ApiKey,
-        'Content-Type': 'application/json',
-      },
+      baseURL,
+      headers,
     });
   }
 
@@ -117,17 +109,15 @@ export class ChatwootClient {
     privates: boolean,
     content_type:
       | 'text'
+      | 'input_select' // dropdown or choice
+      | 'cards'
       | 'image'
       | 'video'
       | 'audio'
       | 'file'
-      | 'card'
       | 'carousel'
-      | 'cards'
       | 'location'
-      | 'bloc'
-      | 'dropdown'
-      | 'choice',
+      | 'bloc',
     content_attributes?: unknown,
     template_params?: Record<string, unknown>,
   ) {
@@ -143,22 +133,30 @@ export class ChatwootClient {
       sender: Record<string, unknown>;
       conversation_id: number;
     };
-    if (
-      content_type === 'image' ||
-      content_type === 'video' ||
-      content_type === 'audio' ||
-      content_type === 'file'
-    ) {
+    if (['image', 'video', 'audio', 'file'].includes(content_type)) {
       const stream = await axios.get(content, { responseType: 'stream' });
+      const urlPath = new URL(content);
+      const file = urlPath.pathname.split('/').pop() as string;
+      const mimeType = Mime.getType(file) as string;
+      const filename = file.split('.').shift() as string;
       const formData = new FormData();
-      formData.append('attachments[]', stream.data);
-      formData.append('content', content);
+      formData.append('attachments[]', stream.data, {
+        filename,
+        contentType: mimeType,
+      });
+      formData.append('content', filename);
       formData.append('message_type', 'outgoing');
       formData.append('file_type', content_type);
+
+      const headers = {
+        ...formData.getHeaders(),
+        api_access_token: this.ApiKey,
+      };
 
       const { data } = await this.axios.post<response>(
         `/conversations/${conversation_id}/messages`,
         formData,
+        { headers },
       );
 
       return data;
@@ -228,9 +226,7 @@ export class ChatwootClient {
           }>;
         };
       };
-    }>(`/contacts/${contact_Id}`, {
-      headers: { api_access_token: this.ApiKey },
-    });
+    }>(`/contacts/${contact_Id}`);
 
     const {
       email,
@@ -295,11 +291,7 @@ export class ChatwootClient {
           }>;
         };
       };
-    }>(
-      `/contacts/${contact_Id}`,
-      { ...updateData },
-      { headers: { api_access_token: this.ApiKey } },
-    );
+    }>(`/contacts/${contact_Id}`, { ...updateData });
 
     const {
       email,

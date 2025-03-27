@@ -153,6 +153,7 @@ export default new Integration({
         text: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.text;
           const {
@@ -185,6 +186,7 @@ export default new Integration({
         choice: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.text;
           const content_attributes = {
@@ -216,7 +218,7 @@ export default new Integration({
             content,
             'outgoing',
             false,
-            type,
+            'input_select',
             content_attributes,
           );
 
@@ -225,6 +227,7 @@ export default new Integration({
         dropdown: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.text;
           const content_attributes = {
@@ -256,7 +259,7 @@ export default new Integration({
             content,
             'outgoing',
             false,
-            type,
+            'input_select',
             content_attributes,
           );
 
@@ -265,6 +268,7 @@ export default new Integration({
         image: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.imageUrl;
           const {
@@ -282,7 +286,6 @@ export default new Integration({
             agentBotApiKey,
             ctx.configuration.accountId,
             ctx.configuration.baseUrl,
-            true,
           );
 
           const { id } = await chatwootClient.createNewMessage(
@@ -298,6 +301,7 @@ export default new Integration({
         video: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.videoUrl;
           const {
@@ -315,7 +319,6 @@ export default new Integration({
             agentBotApiKey,
             ctx.configuration.accountId,
             ctx.configuration.baseUrl,
-            true,
           );
 
           const { id } = await chatwootClient.createNewMessage(
@@ -331,6 +334,7 @@ export default new Integration({
         audio: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.audioUrl;
           const {
@@ -348,7 +352,6 @@ export default new Integration({
             agentBotApiKey,
             ctx.configuration.accountId,
             ctx.configuration.baseUrl,
-            true,
           );
 
           const { id } = await chatwootClient.createNewMessage(
@@ -364,6 +367,7 @@ export default new Integration({
         file: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.fileUrl;
           const {
@@ -381,7 +385,6 @@ export default new Integration({
             agentBotApiKey,
             ctx.configuration.accountId,
             ctx.configuration.baseUrl,
-            true,
           );
 
           const { id } = await chatwootClient.createNewMessage(
@@ -397,6 +400,7 @@ export default new Integration({
         bloc: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = 'bloc';
           const content_attributes = payload;
@@ -432,6 +436,7 @@ export default new Integration({
         carousel: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.items.map(item => item.title).join('\n');
           const content_attributes = {
@@ -488,6 +493,7 @@ export default new Integration({
         card: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.title;
           const content_attributes = {
@@ -537,7 +543,7 @@ export default new Integration({
             content,
             'outgoing',
             false,
-            type,
+            'cards',
             content_attributes,
           );
 
@@ -546,6 +552,7 @@ export default new Integration({
         location: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
           const conversation_id = conversation.tags.id as string;
           const content = payload.title as string;
           const content_attributes = {
@@ -587,7 +594,6 @@ export default new Integration({
   },
   handler: async params => {
     const { logger, client, req } = params;
-    logger.forBot().debug('Received message from Chatwoot' + req.body);
     const data = JSON.parse(req.body as string) as {
       account: {
         id: number;
@@ -715,12 +721,16 @@ export default new Integration({
       source_id: string;
       event: string;
     };
-    const conversationId = data?.id.toString();
-    const userId = data?.sender?.id.toString();
-    const phone_number = data?.sender?.phone_number;
+    const message_type = data?.message_type;
+    if (message_type === 'outgoing') {
+      return;
+    }
+    const chatwootConversationId = data?.conversation.id.toString();
+    const chatwootUserId = data?.sender?.id.toString();
+    const chatwootMessageId = data?.conversation.messages[0]?.id.toString();
+    const phone_number = data?.sender?.phone_number || '';
     const email = data?.sender?.email || '';
     const name = data?.sender?.name || '';
-    const messageId = data?.conversation.messages[0]?.id.toString();
     const platform =
       data?.conversation?.channel?.replace('Channel::', '') || '';
     const inboxId = data?.conversation?.inbox_id.toString();
@@ -745,12 +755,12 @@ export default new Integration({
     logger.forBot().debug(
       'Received message from Chatwoot' +
         JSON.stringify({
-          conversationId,
-          userId,
+          conversationId: chatwootConversationId,
+          userId: chatwootUserId,
+          messageId: chatwootMessageId,
           inboxId,
           platform,
-          messageId,
-          type,
+          content_type,
           content,
         }),
     );
@@ -828,18 +838,18 @@ export default new Integration({
     }
     */
 
-    await client.getOrCreateConversation({
+    const { conversation } = await client.getOrCreateConversation({
       channel: 'chatwoot',
       tags: {
-        id: conversationId,
+        id: chatwootConversationId,
         platform: platform,
         inboxId: inboxId,
       },
     });
 
-    await client.getOrCreateUser({
+    const { user } = await client.getOrCreateUser({
       tags: {
-        id: userId,
+        id: chatwootUserId,
         name: name,
         email: email,
         phone_number: phone_number,
@@ -847,10 +857,10 @@ export default new Integration({
     });
 
     await client.getOrCreateMessage({
-      userId,
-      conversationId,
+      userId: user.id,
+      conversationId: conversation.id,
       tags: {
-        id: messageId,
+        id: chatwootMessageId,
       },
       type,
       payload: { text: content ?? '' },
