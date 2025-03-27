@@ -292,7 +292,7 @@ export default new Integration({
             conversation_id,
             content,
             'outgoing',
-            false,
+            true,
             type,
           );
 
@@ -325,7 +325,7 @@ export default new Integration({
             conversation_id,
             content,
             'outgoing',
-            false,
+            true,
             type,
           );
 
@@ -397,6 +397,129 @@ export default new Integration({
 
           await ack({ tags: { id: id.toString() } });
         },
+        card: async params => {
+          const { ctx, client, ack, type, payload, conversation, logger } =
+            params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
+          const conversation_id = conversation.tags.id as string;
+          const content = payload.title;
+          const item: {
+            media_url: string;
+            title: string;
+            description: string;
+            actions?: Array<{
+              type: string;
+              text: string;
+              uri?: string;
+              payload?: string;
+            }>;
+          } = {
+            media_url: payload.imageUrl as string,
+            title: payload.title,
+            description: payload.subtitle as string,
+          };
+
+          if (payload.actions?.length) {
+            item.actions = payload.actions.map(({ action, label, value }) => {
+              return action === 'url'
+                ? { type: 'link', text: label, uri: value }
+                : { type: 'postback', text: label, payload: value };
+            });
+          }
+          const content_attributes = { items: [item] };
+
+          const {
+            state: {
+              payload: { agentBotApiKey },
+            },
+          } = await client.getState({
+            id: ctx.integrationId,
+            type: 'integration',
+            name: 'configuration',
+          });
+
+          const chatwootClient = new ChatwootClient(
+            logger,
+            agentBotApiKey,
+            ctx.configuration.accountId,
+            ctx.configuration.baseUrl,
+          );
+
+          const { id } = await chatwootClient.createNewMessage(
+            conversation_id,
+            content,
+            'outgoing',
+            false,
+            'cards',
+            content_attributes,
+          );
+
+          await ack({ tags: { id: id.toString() } });
+        },
+        carousel: async params => {
+          const { ctx, client, ack, type, payload, conversation, logger } =
+            params;
+          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
+          const conversation_id = conversation.tags.id as string;
+          const content = payload.items.map(item => item.title).join('\n');
+          const content_attributes = {
+            items: payload.items.map(item => {
+              const card: {
+                media_url: string;
+                title: string;
+                description: string;
+                actions?: Array<{
+                  type: string;
+                  text: string;
+                  uri?: string;
+                  payload?: string;
+                }>;
+              } = {
+                media_url: item.imageUrl as string,
+                title: item.title,
+                description: item.subtitle as string,
+              };
+
+              if (item.actions?.length) {
+                card.actions = item.actions.map(({ action, label, value }) => {
+                  return action === 'url'
+                    ? { type: 'link', text: label, uri: value }
+                    : { type: 'postback', text: label, payload: value };
+                });
+              }
+
+              return card;
+            }),
+          };
+
+          const {
+            state: {
+              payload: { agentBotApiKey },
+            },
+          } = await client.getState({
+            id: ctx.integrationId,
+            type: 'integration',
+            name: 'configuration',
+          });
+
+          const chatwootClient = new ChatwootClient(
+            logger,
+            agentBotApiKey,
+            ctx.configuration.accountId,
+            ctx.configuration.baseUrl,
+          );
+
+          const { id } = await chatwootClient.createNewMessage(
+            conversation_id,
+            content,
+            'outgoing',
+            false,
+            type,
+            content_attributes,
+          );
+
+          await ack({ tags: { id: id.toString() } });
+        },
         bloc: async params => {
           const { ctx, client, ack, type, payload, conversation, logger } =
             params;
@@ -428,122 +551,6 @@ export default new Integration({
             'outgoing',
             false,
             type,
-            content_attributes,
-          );
-
-          await ack({ tags: { id: id.toString() } });
-        },
-        carousel: async params => {
-          const { ctx, client, ack, type, payload, conversation, logger } =
-            params;
-          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
-          const conversation_id = conversation.tags.id as string;
-          const content = payload.items.map(item => item.title).join('\n');
-          const content_attributes = {
-            items: payload.items.map(item => ({
-              media_url: item.imageUrl,
-              title: item.title,
-              description: item.subtitle,
-              actions: item.actions.map(({ action, label, value }) => {
-                if (action === 'url') {
-                  return {
-                    type: 'link',
-                    text: label,
-                    uri: value,
-                  };
-                } else {
-                  return {
-                    type: 'postback',
-                    text: label,
-                    payload: value,
-                  };
-                }
-              }),
-            })),
-          };
-
-          const {
-            state: {
-              payload: { agentBotApiKey },
-            },
-          } = await client.getState({
-            id: ctx.integrationId,
-            type: 'integration',
-            name: 'configuration',
-          });
-
-          const chatwootClient = new ChatwootClient(
-            logger,
-            agentBotApiKey,
-            ctx.configuration.accountId,
-            ctx.configuration.baseUrl,
-          );
-
-          const { id } = await chatwootClient.createNewMessage(
-            conversation_id,
-            content,
-            'outgoing',
-            false,
-            type,
-            content_attributes,
-          );
-
-          await ack({ tags: { id: id.toString() } });
-        },
-        card: async params => {
-          const { ctx, client, ack, type, payload, conversation, logger } =
-            params;
-          logger.forBot().debug(`Sending ${type} message to Chatwoot`);
-          const conversation_id = conversation.tags.id as string;
-          const content = payload.title;
-          const content_attributes = {
-            items: [
-              {
-                media_url: payload.imageUrl,
-                title: payload.title,
-                description: payload.subtitle,
-                actions: payload.actions.map(({ action, label, value }) => {
-                  if (action === 'url') {
-                    return {
-                      type: 'link',
-                      text: label,
-                      uri: value,
-                    };
-                  } else {
-                    return {
-                      type: 'postback',
-                      text: label,
-                      payload: value,
-                    };
-                  }
-                }),
-              },
-            ],
-          };
-
-          const {
-            state: {
-              payload: { agentBotApiKey },
-            },
-          } = await client.getState({
-            id: ctx.integrationId,
-            type: 'integration',
-            name: 'configuration',
-          });
-
-          const chatwootClient = new ChatwootClient(
-            logger,
-            agentBotApiKey,
-            ctx.configuration.accountId,
-            ctx.configuration.baseUrl,
-          );
-
-          const { id } = await chatwootClient.createNewMessage(
-            conversation_id,
-            content,
-            'outgoing',
-            false,
-            'cards',
             content_attributes,
           );
 

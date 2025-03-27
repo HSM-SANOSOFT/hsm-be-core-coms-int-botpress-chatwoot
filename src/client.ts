@@ -138,15 +138,16 @@ export class ChatwootClient {
       const urlPath = new URL(content);
       const file = urlPath.pathname.split('/').pop() as string;
       const mimeType = Mime.getType(file) as string;
-      const filename = file.split('.').shift() as string;
+      const filename = ''; //file.split('.').shift() as string;
       const formData = new FormData();
       formData.append('attachments[]', stream.data, {
         filename,
         contentType: mimeType,
+        filepath: content,
       });
       formData.append('content', filename);
       formData.append('message_type', 'outgoing');
-      formData.append('file_type', content_type);
+      formData.append('file_type', mimeType);
 
       const headers = {
         ...formData.getHeaders(),
@@ -159,6 +160,7 @@ export class ChatwootClient {
         { headers },
       );
 
+      this.logger.forBot().debug('File Sent' + JSON.stringify(data));
       return data;
     }
     const { data } = await this.axios.post<response>(
