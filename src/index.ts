@@ -654,6 +654,7 @@ export default new Integration({
     });
 
     const { user } = await client.getOrCreateUser({
+      name: name,
       tags: {
         id: chatwootUserId,
         name: name,
