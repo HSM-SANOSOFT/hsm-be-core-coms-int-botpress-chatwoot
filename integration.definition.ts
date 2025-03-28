@@ -102,7 +102,9 @@ export default new IntegrationDefinition({
           custom_attributes: z
             .array(z.record(z.unknown()))
             .optional()
-            .describe('Custom attributes to update'),
+            .describe(
+              'Custom attributes to update as an array of one object: [{key: value}]',
+            ),
         }),
       },
       output: {
