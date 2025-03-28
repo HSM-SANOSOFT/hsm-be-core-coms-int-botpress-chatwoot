@@ -207,23 +207,6 @@ export class ChatwootClient {
     return data;
   }
 
-  async toggleStatus(
-    conversation_id: number,
-    status: 'open' | 'resolved | pending',
-  ) {
-    const { data } = await this.axios.post<{
-      meta: Record<string, unknown>;
-      payload: {
-        success: boolean;
-        current_status: 'open' | 'resolved';
-        conversation_id: number;
-      };
-    }>(`/conversations/${conversation_id}`, { status });
-
-    this.logger.forBot().debug('Status Changed' + JSON.stringify(data));
-    return data;
-  }
-
   async getContact(contact_Id: number) {
     const { data } = await this.axios.get<contact>(`/contacts/${contact_Id}`);
 
@@ -283,6 +266,23 @@ export class ChatwootClient {
     return response;
   }
 
+  async toggleStatus(
+    conversation_id: number,
+    status: 'open' | 'resolved | pending',
+  ) {
+    const { data } = await this.axios.post<{
+      meta: Record<string, unknown>;
+      payload: {
+        success: boolean;
+        current_status: 'open' | 'resolved';
+        conversation_id: number;
+      };
+    }>(`/conversations/${conversation_id}/toggle_status`, { status });
+
+    this.logger.forBot().debug('Status Changed' + JSON.stringify(data));
+    return data;
+  }
+
   async assignConversation({
     conversation_id,
     assignee_id,
@@ -304,7 +304,7 @@ export class ChatwootClient {
       confirmed: boolean;
       custom_attributes: Record<string, unknown>;
       account: Array<Record<string, unknown>>;
-    }>(`/conversations/${conversation_id}/assign`, {
+    }>(`/conversations/${conversation_id}/assignments`, {
       assignee_id,
       team_id,
     });
