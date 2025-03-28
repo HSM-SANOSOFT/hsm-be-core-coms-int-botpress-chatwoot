@@ -68,9 +68,9 @@ export class ChatwootClient {
       account_id: number;
       access_token: string;
     }>(`/agent_bots`, {
-      name: 'Test Agent Bot',
+      name: 'Botpress Agent Bot',
       outgoing_url,
-      description: 'Test Agent Bot',
+      description: 'Botpress Agent Bot',
     });
     this.logger.forBot().debug('Agent Bot Created' + JSON.stringify(data));
     return data;
