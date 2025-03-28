@@ -76,8 +76,29 @@ export class ChatwootClient {
     return data;
   }
 
-  async deleteAgentBot(agentBotId: Array<number>) {
-    for (const id of agentBotId) {
+  async getAgentBot() {
+    const { data } = await this.axios.get<
+      Array<{
+        id: number;
+        name: string;
+        description: string;
+        outgoing_url: string;
+        bot_type: string;
+        bot_config: Record<string, unknown>;
+        account_id: number;
+        access_token: string;
+      }>
+    >(`/agent_bots`);
+
+    const agentBotIds = data.map(bot => bot.id);
+
+    this.logger.forBot().debug('Agent Bots' + JSON.stringify(agentBotIds));
+
+    return agentBotIds;
+  }
+
+  async deleteAgentBot(agentBotIds: Array<number>) {
+    for (const id of agentBotIds) {
       await this.axios.delete(`/agent_bots/${id}`, {
         headers: { api_access_token: this.ApiKey },
       });

@@ -49,7 +49,10 @@ export default new Integration({
       ctx.configuration.baseUrl,
     );
     logger.forBot().debug('Deleting Chatwoot agent bot');
-    await chatwootClient.deleteAgentBot(ctx.configuration.inboxNumber);
+    const agentBotIds = await chatwootClient.getAgentBot();
+    if (agentBotIds.length) {
+      await chatwootClient.deleteAgentBot(agentBotIds);
+    }
   },
 
   actions: {
