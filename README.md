@@ -7,7 +7,7 @@
 2. Install Botpress CLI:
 
    ```sh
-   pnpm install -g @botpress/cli
+   pnpm install -g @botpress/cli 
    ```
 
 3. Clone the Repo
@@ -22,9 +22,11 @@
    ```
 
    ### Install Dependencies
-2. Install the Botpress SDK:
+2. Install the Botpress dependencies:
    ```sh
-   pnpm add @botpress/sdk
+   pnpm install @botpress/sdk @botpress/client zod axios
+   pnpm install -D @botpress/cli typescript @types/node ts-node
+   bp gen
    ```
 
 # Setup Botpress Client
