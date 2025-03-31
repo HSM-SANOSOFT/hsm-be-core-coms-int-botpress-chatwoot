@@ -1,9 +1,21 @@
 import type { AxiosInstance } from 'axios';
+import { AxiosError } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
 import Mime from 'mime';
 
 import type { Logger } from '.botpress';
+
+interface AxiosErrorData {
+  message?: string;
+  attributes?: string[];
+}
+type updateData = {
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  custom_attributes?: Record<string, unknown>;
+};
 
 type contact = {
   payload: {
@@ -253,37 +265,85 @@ export class ChatwootClient {
 
   async updateContact(
     contact_Id: number,
-    updateData: {
+    dataU: {
       name?: string;
       email?: string;
       phone_number?: string;
-      avatar?: string;
-      avatar_url?: string;
-      identifier?: string;
-      custom_attributes?: Record<string, unknown>;
+      custom_attributes?: Record<string, unknown>[];
     },
   ) {
-    const { data } = await this.axios.put<contact>(`/contacts/${contact_Id}`, {
-      ...updateData,
-    });
+    const bodyBuilder = (addEmail = true): updateData => {
+      const updateData: updateData = {};
 
-    const {
-      email,
-      name,
-      phone_number,
-      additional_attributes,
-      custom_attributes,
-    } = data.payload;
+      if (dataU.name) {
+        updateData.name = dataU.name;
+      }
 
-    const response = {
-      email,
-      name,
-      phone_number,
-      additional_attributes,
-      custom_attributes,
+      if (dataU.email && addEmail) {
+        updateData.email = dataU.email;
+      }
+
+      if (dataU.phone_number) {
+        updateData.phone_number = dataU.phone_number;
+      }
+
+      if (dataU.custom_attributes?.length) {
+        updateData.custom_attributes = dataU.custom_attributes[0];
+      }
+
+      this.logger.forBot().warn('updateData', updateData);
+      return updateData;
     };
-    this.logger.forBot().debug('Contact Updated' + JSON.stringify(response));
-    return response;
+
+    const request = (Payload: updateData) => async () => {
+      const { data } = await this.axios.put<contact>(
+        `/contacts/${contact_Id}`,
+        { ...Payload },
+      );
+
+      const {
+        email,
+        name,
+        phone_number,
+        additional_attributes,
+        custom_attributes,
+      } = data.payload;
+
+      const response = {
+        email,
+        name,
+        phone_number,
+        additional_attributes,
+        custom_attributes,
+      };
+
+      this.logger.forBot().debug('Contact Updated' + JSON.stringify(response));
+      return response;
+    };
+
+    try {
+      const body = bodyBuilder();
+      return await request(body)();
+    } catch (error: unknown) {
+      if (error instanceof AxiosError && error.response?.status === 422) {
+        const errData = error.response.data as AxiosErrorData;
+
+        const isDuplicateEmail =
+          errData.message === 'Email has already been taken' &&
+          errData.attributes?.includes('email');
+
+        if (isDuplicateEmail) {
+          this.logger
+            .forBot()
+            .warn('Email already taken. Retrying without email.');
+
+          const retryBody = bodyBuilder(false);
+          return await request(retryBody)();
+        }
+      }
+
+      throw error;
+    }
   }
 
   async toggleStatus(

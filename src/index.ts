@@ -142,22 +142,7 @@ export default new Integration({
 
       const { contact_Id, ...data } = input;
 
-      const { custom_attributes } = data;
-
-      const updateData: {
-        name?: string;
-        email?: string;
-        phone_number?: string;
-        custom_attributes?: Record<string, unknown>;
-      } = {
-        ...data,
-        custom_attributes: custom_attributes?.[0] as Record<string, unknown>,
-      };
-
-      const response = await chatwootClient.updateContact(
-        contact_Id,
-        updateData,
-      );
+      const response = await chatwootClient.updateContact(contact_Id, data);
 
       return response;
     },
