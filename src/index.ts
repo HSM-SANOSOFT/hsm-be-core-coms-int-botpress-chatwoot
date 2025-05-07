@@ -620,16 +620,20 @@ export default new Integration({
     const content = data?.content;
 
     logger.forBot().debug(
-      'Received message from Chatwoot' +
-        JSON.stringify({
-          conversationId: chatwootConversationId,
-          userId: chatwootUserId,
-          messageId: chatwootMessageId,
-          inboxId,
-          platform,
-          content_type,
-          content,
-        }),
+      'Received message from Chatwoot \n' +
+        JSON.stringify(
+          {
+            conversationId: chatwootConversationId,
+            userId: chatwootUserId,
+            messageId: chatwootMessageId,
+            inboxId,
+            platform,
+            content_type,
+            content,
+          },
+          null,
+          2,
+        ),
     );
 
     const { conversation } = await client.getOrCreateConversation({

@@ -84,7 +84,9 @@ export class ChatwootClient {
       outgoing_url,
       description: 'Botpress Agent Bot',
     });
-    this.logger.forBot().debug('Agent Bot Created' + JSON.stringify(data));
+    this.logger
+      .forBot()
+      .debug('Agent Bot Created\n' + JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -104,7 +106,9 @@ export class ChatwootClient {
 
     const agentBotIds = data.map(bot => bot.id);
 
-    this.logger.forBot().debug('Agent Bots' + JSON.stringify(agentBotIds));
+    this.logger
+      .forBot()
+      .debug('Agent Bots\n' + JSON.stringify(agentBotIds, null, 2));
 
     return agentBotIds;
   }
@@ -161,7 +165,9 @@ export class ChatwootClient {
       .debug(
         `Agent Bot Assigned to inbox ${inboxId} has api token: ${data.access_token.token}`,
       );
-    this.logger.forBot().debug('Agent Bot Assigned' + JSON.stringify(data));
+    this.logger
+      .forBot()
+      .debug('Agent Bot Assigned\n' + JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -220,7 +226,7 @@ export class ChatwootClient {
         { headers },
       );
 
-      this.logger.forBot().debug('File Sent' + JSON.stringify(data));
+      this.logger.forBot().debug('File Sent\n' + JSON.stringify(data, null, 2));
       return data;
     }
     const { data } = await this.axios.post<response>(
@@ -235,7 +241,9 @@ export class ChatwootClient {
       },
     );
 
-    this.logger.forBot().debug('Message Created' + JSON.stringify(data));
+    this.logger
+      .forBot()
+      .debug('Message Created\n' + JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -259,7 +267,7 @@ export class ChatwootClient {
     };
     this.logger
       .forBot()
-      .debug('Contact Information' + JSON.stringify(response));
+      .debug('Contact Information\n' + JSON.stringify(response, null, 2));
     return response;
   }
 
@@ -317,7 +325,9 @@ export class ChatwootClient {
         custom_attributes,
       };
 
-      this.logger.forBot().debug('Contact Updated' + JSON.stringify(response));
+      this.logger
+        .forBot()
+        .debug('Contact Updated\n' + JSON.stringify(data, null, 2));
       return response;
     };
 
@@ -359,7 +369,9 @@ export class ChatwootClient {
       };
     }>(`/conversations/${conversation_id}/toggle_status`, { status });
 
-    this.logger.forBot().debug('Status Changed' + JSON.stringify(data));
+    this.logger
+      .forBot()
+      .debug('Status Changed\n' + JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -389,7 +401,9 @@ export class ChatwootClient {
       team_id,
     });
 
-    this.logger.forBot().debug('Conversation Assigned' + JSON.stringify(data));
+    this.logger
+      .forBot()
+      .debug('Conversation Assigned\n' + JSON.stringify(data, null, 2));
     return data;
   }
 }
