@@ -113,13 +113,16 @@ export class ChatwootClient {
     return agentBotIds;
   }
 
-  async deleteAgentBot(agentBotIds: Array<number>) {
+  async deleteAgentBot(agentBotIds: number[]) {
     for (const id of agentBotIds) {
-      await this.axios.delete(`/agent_bots/${id}`, {
-        headers: { api_access_token: this.ApiKey },
-      });
-      this.logger.forBot().debug(`Deleted agent bot ID: ${id}`);
-      //if (id !== 2366) {}
+      try {
+        await this.axios.delete(`/agent_bots/${id}`, {
+          headers: { api_access_token: this.ApiKey },
+        });
+        this.logger.forBot().debug(`Deleted agent bot ID: ${id}`);
+      } catch (error) {
+        this.logger.forBot().error(`Failed to delete agent bot ID ${id}}`);
+      }
     }
     this.logger.forBot().debug('Agent Bot deletion process completed');
   }

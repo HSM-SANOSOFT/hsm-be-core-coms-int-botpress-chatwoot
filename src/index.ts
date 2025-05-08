@@ -460,6 +460,7 @@ export default new Integration({
       },
     },
   },
+
   handler: async params => {
     const { logger, client, req } = params;
     const data = JSON.parse(req.body as string) as {
@@ -593,6 +594,12 @@ export default new Integration({
     if (message_type === 'outgoing') {
       return;
     }
+
+    const status = data?.conversation.status;
+    if (status === 'open') {
+      return;
+    }
+
     const chatwootConversationId = data?.conversation.id.toString();
     const chatwootUserId = data?.sender?.id.toString();
     const chatwootMessageId = data?.conversation.messages[0]?.id.toString();
