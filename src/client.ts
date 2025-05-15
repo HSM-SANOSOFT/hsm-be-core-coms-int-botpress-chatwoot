@@ -361,7 +361,7 @@ export class ChatwootClient {
 
   async toggleStatus(
     conversation_id: number,
-    status: 'open' | 'resolved | pending',
+    status: 'open' | 'resolved' | 'pending',
   ) {
     const { data } = await this.axios.post<{
       meta: Record<string, unknown>;

@@ -56,6 +56,28 @@ export default new Integration({
   },
 
   actions: {
+    closeConversation: async params => {
+      const { ctx, input, client, logger } = params;
+      const conversation_id = input.conversation_id;
+      const {
+        state: {
+          payload: { agentBotApiKey },
+        },
+      } = await client.getState({
+        id: ctx.integrationId,
+        type: 'integration',
+        name: 'configuration',
+      });
+
+      const chatwootClient = new ChatwootClient(
+        logger,
+        agentBotApiKey,
+        ctx.configuration.accountId,
+        ctx.configuration.baseUrl,
+      );
+      await chatwootClient.toggleStatus(conversation_id, 'resolved');
+      return { currentStatus: 'closed' };
+    },
     sendToAgent: async params => {
       const { ctx, input, client, logger } = params;
       const conversation_id = input.conversation_id;

@@ -1,6 +1,22 @@
 import { z } from '@botpress/sdk';
 
 export const actions = {
+  closeConversation: {
+    title: 'Close Conversation',
+    description: 'Closes a conversation in Chatwoot',
+    input: {
+      schema: z.object({
+        conversation_id: z
+          .number()
+          .describe('The numeric chatwoot ID of the conversation'),
+      }),
+    },
+    output: {
+      schema: z.object({
+        currentStatus: z.string().describe('Conversation Status'),
+      }),
+    },
+  },
   sendToAgent: {
     title: 'Send to Agent',
     description:
