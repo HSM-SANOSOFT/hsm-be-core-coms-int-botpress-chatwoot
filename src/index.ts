@@ -612,12 +612,21 @@ export default new Integration({
       source_id: string;
       event: string;
     };
+    // Chatwoot also sends conversation_* / contact_* events to this webhook.
+    // Their payload has no `conversation` key, so only handle new messages.
+    if (data?.event !== 'message_created' || !data?.conversation) {
+      logger
+        .forBot()
+        .debug(`Ignoring Chatwoot webhook event: ${data?.event ?? 'unknown'}`);
+      return;
+    }
+
     const message_type = data?.message_type;
     if (message_type === 'outgoing') {
       return;
     }
 
-    const status = data?.conversation.status;
+    const status = data?.conversation?.status;
     if (status === 'open') {
       return;
     }
